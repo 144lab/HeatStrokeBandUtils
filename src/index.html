@@ -1,0 +1,70 @@
+<head>
+  <meta charset="UTF-8" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/spectre.css/dist/spectre.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css"
+  />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <header class="navbar">
+    <section class="navbar-section">
+      <a href="#/" class="navbar-brand">Heatstroke Band Utility</a>
+    </section>
+  </header>
+  <main class="container">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label class="form-label" for="dump-start">DUMP WAVEFORM</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <button id="dump-start" class="btn btn-primary input-group-btn">
+              START
+            </button>
+            <button id="dump-stop" class="btn input-group-btn">
+              STOP
+            </button>
+            <span id="dump-count" class="input-group-addon">0</span>
+            <a
+              id="dump-download"
+              href="#"
+              download="heartrate.csv"
+              class="btn input-group-btn"
+            >
+              DOWNLOAD
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label class="form-label" for="test-start">TEST MODE</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <button id="test-start" class="btn btn-primary input-group-btn">
+              START
+            </button>
+            <button id="test-stop" class="btn input-group-btn">
+              STOP
+            </button>
+            <span id="test-count" class="input-group-addon">0</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+  <script src="app.js"></script>
+</body>
