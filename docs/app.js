@@ -9,21 +9,18 @@ const config = {
   Waveform: {
     uuid: rawNotifyUUID,
     write: new Uint8Array([0xfd]), /// RAW-MODE
-    dataRate: 32,
     fname: "waveform.csv",
     makeLines: parseWave
   },
   RRI: {
     uuid: rriNotifyUUID,
     write: new Uint8Array([0xfc]), /// RRI-MODE
-    dataRate: 1,
     fname: "rri.csv",
     makeLines: parseRRI
   },
   Normal: {
     uuid: envNotifyUUID,
     write: new Uint8Array([0x01]), /// NORMAL-MODE
-    dataRate: 1,
     fname: "normal.csv",
     makeLines: parseEnv
   }
@@ -40,6 +37,7 @@ async function collectStart(ev) {
   const device = await navigator.bluetooth.requestDevice({
     filters: [{ services: [serviceUuid] }]
   });
+  console.log(device.id);
   device.addEventListener("gattserverdisconnected", collectStop);
   console.log("Connecting to GATT Server...");
   var server = await device.gatt.connect();
@@ -51,9 +49,10 @@ async function collectStart(ev) {
   var notify = await service.getCharacteristic(settings.uuid);
   notify.addEventListener("characteristicvaluechanged", async event => {
     const value = event.target.value;
-    store.push(value.buffer);
-    document.getElementById("count").value = store.length * settings.dataRate;
+    store.push(...settings.makeLines(value.buffer));
+    document.getElementById("count").value = store.length;
   });
+  document.getElementById("count").value = store.length;
   await notify.startNotifications();
   close = async () => {
     if (server.connected) {
@@ -81,7 +80,7 @@ async function collectStop(ev) {
   document.getElementById("stop").disabled = true;
   document.getElementById("start").disabled = false;
   if (close) await close();
-  var blob = new Blob(settings.makeLines(store), { type: "text/csv" });
+  var blob = new Blob(store, { type: "text/csv" });
   document.getElementById("download").download = settings.fname;
   document.getElementById("download").href = window.URL.createObjectURL(blob);
   document.getElementById("download").classList.remove("disabled");
@@ -96,33 +95,43 @@ window.addEventListener("DOMContentLoaded", () => {
 
 function parseWave(s) {
   var lines = [];
-  s.forEach(v => {
-    var a = new Uint16Array(v);
-    a.forEach(val => {
-      lines.push(val + "\n");
-    });
+  var a = new Uint16Array(s);
+  a.forEach(val => {
+    lines.push(val + "\n");
   });
   return lines;
 }
 
 function parseRRI(s) {
   var lines = [];
-  s.forEach(v => {
-    var a = new Uint16Array(v);
-    a.forEach(val => {
-      lines.push(val + "\n");
-    });
-  });
+  var data = new DataView(s);
+  var tm = data.getUint32(0, true);
+  var rri = data.getUint16(4, true);
+  line = [String(tm), String(rri)].join(",");
+  console.log(line);
+  lines.push(line + "\n");
   return lines;
 }
 
 function parseEnv(s) {
   var lines = [];
-  s.forEach(v => {
-    var a = new Uint16Array(v);
-    a.forEach(val => {
-      lines.push(val + "\n");
-    });
-  });
+  var data = new DataView(s);
+  var tm = data.getUint32(0, true);
+  var humidity = data.getUint16(4, true) / 1000;
+  var airTemp = data.getUint16(6, true) / 1000;
+  var skinTemp = data.getUint16(8, true) / 1000;
+  var estTemp = data.getUint16(10, true) / 1000;
+  var battery = data.getUint8(12);
+  var flags = data.getUint8(13);
+  line = [
+    String(tm),
+    String(humidity),
+    String(airTemp),
+    String(skinTemp),
+    String(estTemp),
+    String(battery)
+  ].join(",");
+  console.log(line);
+  lines.push(line + "\n");
   return lines;
 }
