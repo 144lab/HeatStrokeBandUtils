@@ -186,7 +186,7 @@ function parseWave(s) {
   var lines = [];
   var a = new Uint16Array(s);
   a.forEach(val => {
-    datasets[0].data.push({ x: now, y: val });
+    //datasets[0].data.push({ x: now, y: val });
     lines.push(val + "\n");
     now += 1.0 / 1024.0;
   });
