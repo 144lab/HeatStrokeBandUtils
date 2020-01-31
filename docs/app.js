@@ -5,34 +5,115 @@ const rawNotifyUUID = "5008e0bd-3581-4d4c-a6d8-c257a369e189";
 const rriNotifyUUID = "b84ea3e8-b237-4b95-a394-6911180b7638";
 const envNotifyUUID = "62fbd229-6edd-4d1a-b554-5c4e1bb29169";
 
+const colors = [
+  { color: "rgb(255, 127, 127)", back: "rgba(255, 127, 127, 0.5)" },
+  { color: "rgb(255, 127, 255)", back: "rgba(255, 127, 255, 0.5)" },
+  { color: "rgb(191, 127, 255)", back: "rgba(191, 127, 255, 0.5)" },
+  { color: "rgb(127, 127, 255)", back: "rgba(127, 127, 255, 0.5)" },
+  { color: "rgb(127, 255, 255)", back: "rgba(127, 255, 255, 0.5)" },
+  { color: "rgb(127, 255, 191)", back: "rgba(127, 255, 191, 0.5)" },
+  { color: "rgb(191, 255, 127)", back: "rgba(191, 255, 127, 0.5)" },
+  { color: "rgb(255, 255, 127)", back: "rgba(255, 255, 127, 0.5)" },
+  { color: "rgb(255, 191, 127)", back: "rgba(255, 191, 127, 0.5)" }
+];
+
 const config = {
   Waveform: {
     uuid: rawNotifyUUID,
     write: new Uint8Array([0xfd]), /// RAW-MODE
     fname: "waveform.csv",
-    makeLines: parseWave
+    makeLines: parseWave,
+    datasets: [
+      {
+        label: "脈波形",
+        borderColor: colors[6].color,
+        backgroundColor: colors[6].back,
+        data: []
+      }
+    ],
+    realtime: {
+      duration: 20000,
+      refresh: 1000,
+      delay: 2000
+    }
   },
   RRI: {
     uuid: rriNotifyUUID,
     write: new Uint8Array([0xfc]), /// RRI-MODE
     fname: "rri.csv",
-    makeLines: parseRRI
+    makeLines: parseRRI,
+    datasets: [
+      {
+        label: "RRI",
+        borderColor: colors[5].color,
+        backgroundColor: colors[5].back,
+        data: []
+      }
+    ],
+    realtime: {
+      duration: 120000,
+      refresh: 5000,
+      delay: 10000
+    }
   },
   Normal: {
     uuid: envNotifyUUID,
     write: new Uint8Array([0x01]), /// NORMAL-MODE
     fname: "normal.csv",
-    makeLines: parseEnv
+    makeLines: parseEnv,
+    datasets: [
+      {
+        label: "湿度",
+        borderColor: colors[0].color,
+        backgroundColor: colors[0].back,
+        data: []
+      },
+      {
+        label: "気温",
+        borderColor: colors[1].color,
+        backgroundColor: colors[1].back,
+        data: []
+      },
+      {
+        label: "皮膚温",
+        borderColor: colors[2].color,
+        backgroundColor: colors[2].back,
+        data: []
+      },
+      {
+        label: "深部体温",
+        borderColor: colors[3].color,
+        backgroundColor: colors[3].back,
+        data: []
+      },
+      {
+        label: "電池残量",
+        borderColor: colors[4].color,
+        backgroundColor: colors[4].back,
+        data: []
+      }
+    ],
+    realtime: {
+      duration: 3600000,
+      refresh: 30000,
+      delay: 30000
+    }
   }
 };
+
+// JSON.parse(JSON.stringify(data));
+
 var close = undefined;
 var store = [];
 
+function getSetting() {
+  return config[document.getElementById("type").value];
+}
+
 async function collectStart(ev) {
-  var mode = document.getElementById("type").value;
-  console.log("start: " + mode);
   ev.preventDefault();
-  const settings = config[mode];
+  const settings = getSetting();
+
   store = [];
   const device = await navigator.bluetooth.requestDevice({
     filters: [{ services: [serviceUuid] }]
@@ -72,10 +153,8 @@ async function collectStart(ev) {
 }
 
 async function collectStop(ev) {
-  var mode = document.getElementById("type").value;
-  console.log("stop: " + mode);
   ev.preventDefault();
-  const settings = config[mode];
+  const settings = getSetting();
 
   document.getElementById("stop").disabled = true;
   document.getElementById("start").disabled = false;
@@ -87,28 +166,51 @@ async function collectStop(ev) {
   return false;
 }
 
+var datasets = undefined;
+var context = undefined;
+var chart = undefined;
+
 window.addEventListener("DOMContentLoaded", () => {
+  context = document.getElementById("output").getContext("2d");
   document.getElementById("stop").disabled = true;
   document.getElementById("stop").addEventListener("click", collectStop);
   document.getElementById("start").addEventListener("click", collectStart);
+  document.getElementById("type").addEventListener("change", () => {
+    datasets = setup(getSetting());
+  });
+  datasets = setup(getSetting());
 });
 
 function parseWave(s) {
+  var now = Date.now();
   var lines = [];
   var a = new Uint16Array(s);
   a.forEach(val => {
+    datasets[0].data.push({ x: now, y: val });
     lines.push(val + "\n");
+    now += 1.0 / 1024.0;
   });
   return lines;
 }
+
+var lastTick = 0;
+var nowTime = 0;
 
 function parseRRI(s) {
   var lines = [];
   var data = new DataView(s);
   var tm = data.getUint32(0, true);
   var rri = data.getUint16(4, true);
+  now = Date.now();
+  if (nowTime + 2000 < now) {
+    nowTime = now;
+  } else {
+    nowTime += tm - lastTick;
+  }
+  lastTick = tm;
+  datasets[0].data.push({ x: nowTime, y: rri });
   line = [String(tm), String(rri)].join(",");
-  console.log(line);
+  console.log(nowTime + ": " + line);
   lines.push(line + "\n");
   return lines;
 }
@@ -123,6 +225,12 @@ function parseEnv(s) {
   var estTemp = data.getUint16(10, true) / 1000;
   var battery = data.getUint8(12);
   var flags = data.getUint8(13);
+  const now = Date.now();
+  datasets[0].data.push({ x: now, y: humidity });
+  datasets[1].data.push({ x: now, y: airTemp });
+  datasets[2].data.push({ x: now, y: skinTemp });
+  datasets[3].data.push({ x: now, y: estTemp });
+  datasets[4].data.push({ x: now, y: battery });
   line = [
     String(tm),
     String(humidity),
@@ -134,4 +242,27 @@ function parseEnv(s) {
   console.log(line);
   lines.push(line + "\n");
   return lines;
+}
+
+function setup(setting) {
+  lastTick = 0;
+  nowTime = Date.now();
+  if (chart != undefined) {
+    chart.destroy();
+  }
+  chart = new Chart(context, {
+    type: "line",
+    data: { datasets: JSON.parse(JSON.stringify(setting.datasets)) },
+    options: {
+      scales: {
+        xAxes: [
+          {
+            type: "realtime",
+            realtime: JSON.parse(JSON.stringify(setting.realtime))
+          }
+        ]
+      }
+    }
+  });
+  return chart.data.datasets;
 }
