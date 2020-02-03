@@ -32,9 +32,9 @@ const config = {
       }
     ],
     realtime: {
-      duration: 20000,
-      refresh: 1000,
-      delay: 2000
+      duration: 10000,
+      refresh: 2000,
+      delay: 4000
     }
   },
   RRI: {
@@ -119,7 +119,10 @@ async function collectStart(ev) {
     filters: [{ services: [serviceUuid] }]
   });
   console.log(device.id);
-  device.addEventListener("gattserverdisconnected", collectStop);
+  device.addEventListener("gattserverdisconnected", event => {
+    cnsole.log(event);
+    collectStop();
+  });
   console.log("Connecting to GATT Server...");
   var server = await device.gatt.connect();
   console.log("Getting Service...");
@@ -127,24 +130,32 @@ async function collectStart(ev) {
   console.log("Getting Characteristic...");
   // console.log(await service.getCharacteristics());
   var write = await service.getCharacteristic(writeUUID);
+  console.log(write);
   var notify = await service.getCharacteristic(settings.uuid);
-  notify.addEventListener("characteristicvaluechanged", async event => {
-    const value = event.target.value;
-    store.push(...settings.makeLines(value.buffer));
+  console.log(notify);
+  try {
+    notify.addEventListener("characteristicvaluechanged", event => {
+      const value = event.target.value;
+      store.push(...settings.makeLines(value.buffer));
+      document.getElementById("count").value = store.length;
+    });
     document.getElementById("count").value = store.length;
-  });
-  document.getElementById("count").value = store.length;
-  await notify.startNotifications();
-  close = async () => {
-    if (server.connected) {
-      await notify.stopNotifications();
-      if (server != undefined) {
-        await server.disconnect();
-        server = undefined;
+    console.log(await notify.startNotifications());
+    close = async () => {
+      if (server.connected) {
+        await notify.stopNotifications();
+        if (server != undefined) {
+          await server.disconnect();
+          server = undefined;
+        }
       }
-    }
-  };
+    };
+  } catch {
+    console.log("error?");
+  }
+  console.log("Getting Characteristic...");
   write.writeValue(settings.write); // ENTER_RAW_MODE
+  console.log("Getting Characteristic...");
 
   document.getElementById("start").disabled = true;
   document.getElementById("stop").disabled = false;
@@ -184,12 +195,13 @@ window.addEventListener("DOMContentLoaded", () => {
 function parseWave(s) {
   var now = Date.now();
   var lines = [];
+  var sum = 0;
   var a = new Uint16Array(s);
   a.forEach(val => {
-    //datasets[0].data.push({ x: now, y: val });
     lines.push(val + "\n");
-    now += 1.0 / 1024.0;
+    sum += val;
   });
+  datasets[0].data.push({ x: now, y: sum / a.length });
   return lines;
 }
 
