@@ -19,28 +19,14 @@
 <body>
   <header class="navbar">
     <section class="navbar-section">
-      <a href="/HeatStrokeBandUtils/#/" class="navbar-brand"
-        >Heatstroke Band Utility</a
+      <a href="/HeatStrokeBandUtils/all/#/" class="navbar-brand"
+        >Heatstroke Band Utility(All Recording)</a
       >
-      <a href="/HeatStrokeBandUtils/all/#/" class="btn btn-link"
-        >All Recording</a
-      >
+      <a href="/HeatStrokeBandUtils/#/" class="btn btn-link">Normal Mode</a>
     </section>
   </header>
   <main class="container">
     <form class="form-horizontal">
-      <div class="form-group">
-        <div class="col-2 col-sm-12">
-          <label class="form-label" for="type">Type</label>
-        </div>
-        <div class="col-10 col-sm-12">
-          <select class="form-select" id="type">
-            <option>Normal</option>
-            <option>RRI</option>
-            <option>Waveform</option>
-          </select>
-        </div>
-      </div>
       <div class="form-group">
         <div class="col-2 col-sm-12">
           <label class="form-label" for="start">Collect</label>
@@ -58,31 +44,59 @@
       </div>
       <div class="form-group">
         <div class="col-2 col-sm-12">
-          <label class="form-label" for="count">Stored</label>
+          <label class="form-label" for="count">Waveform</label>
         </div>
         <div class="col-10 col-sm-12">
-          <input
-            type="number"
-            id="count"
-            class="form-input"
-            readonly
-            value="0"
-          />
+          <div class="input-group">
+            <input
+              type="number"
+              id="rawCount"
+              class="form-input"
+              readonly
+              value="0"
+            />
+            <a id="rawDownload" class="btn btn-primary input-group-btn"
+              >Download</a
+            >
+          </div>
         </div>
       </div>
       <div class="form-group">
         <div class="col-2 col-sm-12">
-          <label class="form-label" for="download">Download</label>
+          <label class="form-label" for="count">RRI</label>
         </div>
         <div class="col-10 col-sm-12">
-          <a
-            id="download"
-            href="#"
-            download="download.csv"
-            class="btn input-group-btn disabled"
-          >
-            DOWNLOAD
-          </a>
+          <div class="input-group">
+            <input
+              type="number"
+              id="rriCount"
+              class="form-input"
+              readonly
+              value="0"
+            />
+            <a id="rriDownload" class="btn btn-primary input-group-btn"
+              >Download</a
+            >
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label class="form-label" for="count">Environment</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <input
+              type="number"
+              id="envCount"
+              class="form-input"
+              readonly
+              value="0"
+            />
+            <a id="envDownload" class="btn btn-primary input-group-btn"
+              >Download</a
+            >
+          </div>
         </div>
       </div>
     </form>

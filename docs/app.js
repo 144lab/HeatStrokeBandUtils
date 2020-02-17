@@ -115,51 +115,48 @@ async function collectStart(ev) {
   const settings = getSetting();
 
   store = [];
-  const device = await navigator.bluetooth.requestDevice({
-    filters: [{ services: [serviceUuid] }]
-  });
-  console.log(device.id);
-  device.addEventListener("gattserverdisconnected", event => {
-    cnsole.log(event);
-    collectStop();
-  });
-  console.log("Connecting to GATT Server...");
-  var server = await device.gatt.connect();
-  console.log("Getting Service...");
-  const service = await server.getPrimaryService(serviceUuid);
-  console.log("Getting Characteristic...");
-  // console.log(await service.getCharacteristics());
-  var write = await service.getCharacteristic(writeUUID);
-  console.log(write);
-  var notify = await service.getCharacteristic(settings.uuid);
-  console.log(notify);
+
   try {
+    const device = await navigator.bluetooth.requestDevice({
+      filters: [{ services: [serviceUuid] }]
+    });
+    console.log(device.id);
+    console.log("Connecting to GATT Server...");
+    const server = await device.gatt.connect();
+    device.addEventListener("gattserverdisconnected", event => {
+      console.log(event);
+      collectStop(event);
+    });
+    console.log("Getting Service...");
+    const service = await server.getPrimaryService(serviceUuid);
+    console.log("Getting Characteristic...");
+    // console.log(await service.getCharacteristics());
+    const write = await service.getCharacteristic(writeUUID);
+    console.log(write);
+    const notify = await service.getCharacteristic(settings.uuid);
+    console.log(notify);
     notify.addEventListener("characteristicvaluechanged", event => {
       const value = event.target.value;
       store.push(...settings.makeLines(value.buffer));
       document.getElementById("count").value = store.length;
     });
     document.getElementById("count").value = store.length;
-    console.log(await notify.startNotifications());
-    close = async () => {
+    console.log("Getting Characteristic...");
+    await write.writeValue(settings.write); // ENTER_RAW_MODE
+    console.log("Getting Characteristic...");
+    await notify.startNotifications();
+    close = () => {
       if (server.connected) {
-        await notify.stopNotifications();
-        if (server != undefined) {
-          await server.disconnect();
-          server = undefined;
-        }
+        notify.stopNotifications();
+        device.gatt.disconnect();
       }
     };
-  } catch {
-    console.log("error?");
+    document.getElementById("start").disabled = true;
+    document.getElementById("stop").disabled = false;
+    document.getElementById("download").classList.add("disabled");
+  } catch (error) {
+    console.log(error);
   }
-  console.log("Getting Characteristic...");
-  write.writeValue(settings.write); // ENTER_RAW_MODE
-  console.log("Getting Characteristic...");
-
-  document.getElementById("start").disabled = true;
-  document.getElementById("stop").disabled = false;
-  document.getElementById("download").classList.add("disabled");
   return false;
 }
 
@@ -169,7 +166,7 @@ async function collectStop(ev) {
 
   document.getElementById("stop").disabled = true;
   document.getElementById("start").disabled = false;
-  if (close) await close();
+  if (close) close();
   var blob = new Blob(store, { type: "text/csv" });
   document.getElementById("download").download = settings.fname;
   document.getElementById("download").href = window.URL.createObjectURL(blob);
@@ -181,7 +178,7 @@ var datasets = undefined;
 var context = undefined;
 var chart = undefined;
 
-window.addEventListener("DOMContentLoaded", () => {
+function init() {
   context = document.getElementById("output").getContext("2d");
   document.getElementById("stop").disabled = true;
   document.getElementById("stop").addEventListener("click", collectStop);
@@ -190,7 +187,7 @@ window.addEventListener("DOMContentLoaded", () => {
     datasets = setup(getSetting());
   });
   datasets = setup(getSetting());
-});
+}
 
 function parseWave(s) {
   var now = Date.now();
