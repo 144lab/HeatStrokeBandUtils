@@ -72,7 +72,9 @@ async function collectStart(ev) {
     };
     document.getElementById("start").disabled = true;
     document.getElementById("stop").disabled = false;
-    document.getElementById("download").classList.add("disabled");
+    document.getElementById("rawDownload").classList.add("disabled");
+    document.getElementById("rriDownload").classList.add("disabled");
+    document.getElementById("envDownload").classList.add("disabled");
   } catch (error) {
     console.log(error);
   }
