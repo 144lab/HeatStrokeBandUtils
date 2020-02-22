@@ -2,7 +2,6 @@ package frontend
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"syscall/js"
 	"time"
@@ -22,12 +21,13 @@ type FileList struct {
 
 // Update ...
 func (c *FileList) Update(fn func()) {
-	tm := time.AfterFunc(100*time.Millisecond, fn)
-	c.Items = vecty.List{}
-	c.manager.GetDirs(func(res js.Value) {
-		go func() {
-			//console.Call("log", res, len(c.Items))
-			idStr := res.Get("name").String()
+	go func() {
+		entries := c.manager.GetDirs()
+		var items vecty.List
+		for i := 0; i < entries.Length(); i++ {
+			entry := entries.Index(i)
+			console.Call("log", len(items), entry)
+			idStr := entry.Get("name").String()
 			id, _ := strconv.Atoi(idStr)
 			item := &FileItem{
 				manager: c.manager,
@@ -36,12 +36,12 @@ func (c *FileList) Update(fn func()) {
 				Size:    c.manager.GetSize(idStr),
 				URL:     c.manager.GetURL(idStr),
 			}
-			c.Items = append(c.Items, item)
-			log.Printf("%#v", c.Items[len(c.Items)-1])
-			tm.Reset(100 * time.Microsecond)
-		}()
-	})
-	//vecty.Rerender(c)
+			items = append(items, item)
+		}
+		c.Items = items
+		vecty.Rerender(c)
+		fn()
+	}()
 }
 
 // Render ...
@@ -82,7 +82,7 @@ func (c *FileList) Render() vecty.ComponentOrHTML {
 
 // FileManager ...
 type FileManager interface {
-	GetDirs(fn func(res js.Value))
+	GetDirs() js.Value
 	GetSize(id string) int64
 	GetURL(id string) string
 	Delete(id string)
@@ -148,6 +148,7 @@ func (c *FileItem) Render() vecty.ComponentOrHTML {
 							"disabled":    len(c.URL) == 0,
 						},
 						prop.Href(c.URL),
+						vecty.Attribute("download", "data.zip"),
 					),
 					vecty.Text("Download"),
 				),

@@ -1,6 +1,7 @@
 package frontend
 
 import (
+	"archive/zip"
 	"fmt"
 	"log"
 	"strconv"
@@ -44,20 +45,18 @@ func (l *Logger) onMakeFS(this js.Value, args []js.Value) interface{} {
 }
 
 // GetDirs ...
-func (l *Logger) GetDirs(fn func(res js.Value)) {
+func (l *Logger) GetDirs() js.Value {
 	if l.fs == js.Undefined() {
-		return
+		return js.Null()
 	}
+	res := make(chan js.Value, 1)
 	l.fs.Get("root").Call("createReader").Call("readEntries",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			entries := args[0]
-			entries.Call("forEach", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				fn(args[0])
-				return nil
-			}))
+			res <- args[0]
 			return nil
 		}),
 	)
+	return <-res
 }
 
 // GetURL ...
@@ -65,45 +64,85 @@ func (l *Logger) GetURL(id string) string {
 	if l.fs == js.Undefined() {
 		return ""
 	}
+	ch := make(chan string, 1)
 	console.Call("log", "get url:", id)
-	files := make(chan js.Value, 3)
 	l.fs.Get("root").Call("getDirectory", id, nil,
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			dir := args[0]
-			for _, fn := range []string{
-				"waveform.bin",
-				"rri.csv",
-				"environment.csv",
-			} {
-				dir.Call("getFile", fn, nil,
-					js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-						files <- args[0]
-						return nil
-					}),
-				)
-			}
+			dir.Call("getFile", "data.zip", map[string]interface{}{"create": true},
+				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+					zipFile := args[0]
+					zipFile.Call("createWriter",
+						js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+							writer := args[0]
+							writer.Set("onwriteend",
+								js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+									go func() {
+										syncCh := make(chan bool, 3)
+										w := &FileWriter{file: zipFile}
+										zw := zip.NewWriter(w)
+										for _, name := range []string{
+											"waveform.bin",
+											"rri.csv",
+											"environment.csv",
+										} {
+											dir.Call("getFile", name, nil,
+												js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+													file := args[0]
+													file.Call("file",
+														js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+															reader := window.Get("FileReader").New()
+															reader.Set("onloadend",
+																js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+																	go func() {
+																		defer func() { syncCh <- true }()
+																		result := args[0].Get("target").Get("result")
+																		sz := result.Get("byteLength").Int()
+																		if sz > 0 {
+																			log.Print("add zip:", file.Get("name").String(), sz)
+																			f, err := zw.Create(file.Get("name").String())
+																			if err != nil {
+																				log.Fatal(err)
+																			}
+																			b := make([]byte, sz)
+																			js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
+																			if _, err := f.Write(b); err != nil {
+																				log.Fatal(b, err)
+																			}
+																		}
+																	}()
+																	return nil
+																}),
+															)
+															reader.Call("readAsArrayBuffer", args[0])
+															return nil
+														}),
+													)
+													return nil
+												}),
+											)
+											<-syncCh
+										}
+										if err := zw.Close(); err != nil {
+											log.Println("Zip Failed:", err)
+										}
+										log.Println("Done")
+										ch <- zipFile.Call("toURL").String()
+									}()
+									return nil
+								}),
+							)
+							writer.Call("truncate", 0)
+							return nil
+						}),
+					)
+					return nil
+				}),
+			)
 			return nil
 		}),
 	)
-	for file := range files {
-		file.Call("file",
-			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				reader := window.Get("FileReader").New()
-				reader.Set("onloadend",
-					js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-						result := args[0].Get("target").Get("result")
-						b := make([]byte, result.Get("byteLength").Int())
-						js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
-						log.Print(b)
-						return nil
-					}),
-				)
-				reader.Call("readAsArrayBuffer", args[0])
-				return nil
-			}),
-		)
-	}
-	return ""
+	return <-ch
 }
 
 // GetSize ...
@@ -224,7 +263,7 @@ func (l *Logger) onMakeFile(this js.Value, args []js.Value) interface{} {
 }
 
 func (l *Logger) write(file js.Value, text string) {
-	l.rawFile.Call("createWriter",
+	file.Call("createWriter",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			writer := args[0]
 			writer.Set("onwrite", js.FuncOf(l.onWrite))
@@ -233,6 +272,7 @@ func (l *Logger) write(file js.Value, text string) {
 			b := window.Get("Blob").New(window.Get("Array").New(text), map[string]interface{}{
 				"type": "text/csv",
 			})
+			log.Print(text)
 			writer.Call("write", b)
 			return nil
 		}),
@@ -271,7 +311,7 @@ func (l *Logger) PostRri(data Rri) {
 
 // PostEnv ...
 func (l *Logger) PostEnv(data Env) {
-	l.write(l.rriFile, fmt.Sprintf("%d, %0.2f, %0.2f, %0.2f, %0.2f, %d\n",
+	l.write(l.envFile, fmt.Sprintf("%d, %0.2f, %0.2f, %0.2f, %0.2f, %d\n",
 		data.Timestamp,
 		data.Humidity,
 		data.Temperature,
@@ -284,6 +324,7 @@ func (l *Logger) PostEnv(data Env) {
 // FileWriter ...
 type FileWriter struct {
 	file js.Value
+	init bool
 }
 
 // Close ...
@@ -292,18 +333,25 @@ func (fw *FileWriter) Close() error {
 }
 
 func (fw *FileWriter) Write(b []byte) (int, error) {
+	ch := make(chan int, 1)
 	fw.file.Call("createWriter",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			writer := args[0]
-			writer.Set("onerror", js.FuncOf(fw.onError))
-			writer.Call("seek", writer.Get("length"))
 			ua := window.Get("Uint8Array").New(len(b))
-			js.CopyBytesToJS(ua, b)
+			sz := js.CopyBytesToJS(ua, b)
+			writer.Set("onerror", js.FuncOf(fw.onError))
+			writer.Set("onwriteend",
+				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+					ch <- sz
+					return nil
+				}),
+			)
+			writer.Call("seek", writer.Get("length"))
 			writer.Call("write", window.Get("Blob").New(window.Get("Array").New(ua)))
 			return nil
 		}),
 	)
-	return 0, nil
+	return <-ch, nil
 }
 
 func (fw *FileWriter) onError(this js.Value, args []js.Value) interface{} {

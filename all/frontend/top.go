@@ -539,6 +539,7 @@ func (c *TopView) OnClickStop(event *vecty.Event) {
 // Update ...
 func (c *TopView) Update() {
 	c.FileList.Update(func() {
+		log.Println("render")
 		vecty.Rerender(c)
 	})
 }
