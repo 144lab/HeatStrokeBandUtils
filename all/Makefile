@@ -30,5 +30,4 @@ deploy:
 	GO111MODULE=on GOOS=js GOARCH=wasm go build -o $(DSTDIR)/main.wasm .
 	echo "$$index_html" > $(DSTDIR)/index.html
 	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js $(DSTDIR)/wasm_exec.js
-	cp -f contents.md $(DSTDIR)/
 	cp -Rf css $(DSTDIR)/

@@ -514,6 +514,9 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 			return
 		}
 		c.Logger.Start()
+		c.RawSize = 0
+		c.RriSize = 0
+		c.EnvSize = 0
 		c.Connected = true
 		c.Stoped = false
 		vecty.Rerender(c)
