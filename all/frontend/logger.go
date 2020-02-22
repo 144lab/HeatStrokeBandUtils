@@ -3,7 +3,6 @@ package frontend
 import (
 	"archive/zip"
 	"fmt"
-	"log"
 	"strconv"
 	"syscall/js"
 	"time"
@@ -78,6 +77,7 @@ func (l *Logger) GetURL(id string) string {
 							writer.Set("onwriteend",
 								js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 									go func() {
+										defer func() { ch <- zipFile.Call("toURL").String() }()
 										syncCh := make(chan bool, 3)
 										w := &FileWriter{file: zipFile}
 										zw := zip.NewWriter(w)
@@ -99,15 +99,17 @@ func (l *Logger) GetURL(id string) string {
 																		result := args[0].Get("target").Get("result")
 																		sz := result.Get("byteLength").Int()
 																		if sz > 0 {
-																			log.Print("add zip:", file.Get("name").String(), sz)
+																			console.Call("log", "add zip:", file.Get("name"), sz)
 																			f, err := zw.Create(file.Get("name").String())
 																			if err != nil {
-																				log.Fatal(err)
+																				console.Call("log", err.Error())
+																				return
 																			}
 																			b := make([]byte, sz)
 																			js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
 																			if _, err := f.Write(b); err != nil {
-																				log.Fatal(b, err)
+																				console.Call("log", err.Error())
+																				return
 																			}
 																		}
 																	}()
@@ -124,10 +126,10 @@ func (l *Logger) GetURL(id string) string {
 											<-syncCh
 										}
 										if err := zw.Close(); err != nil {
-											log.Println("Zip Failed:", err)
+											console.Call("log", "Zip Failed:", err.Error())
+											return
 										}
-										log.Println("Done")
-										ch <- zipFile.Call("toURL").String()
+										console.Call("log", "Done")
 									}()
 									return nil
 								}),
@@ -266,13 +268,13 @@ func (l *Logger) write(file js.Value, text string) {
 	file.Call("createWriter",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			writer := args[0]
-			writer.Set("onwrite", js.FuncOf(l.onWrite))
+			writer.Set("onwriteend", js.FuncOf(l.onWrite))
 			writer.Set("onerror", js.FuncOf(l.onError))
 			writer.Call("seek", writer.Get("length"))
 			b := window.Get("Blob").New(window.Get("Array").New(text), map[string]interface{}{
 				"type": "text/csv",
 			})
-			log.Print(text)
+			console.Call("log", text)
 			writer.Call("write", b)
 			return nil
 		}),
@@ -280,12 +282,13 @@ func (l *Logger) write(file js.Value, text string) {
 }
 
 func (l *Logger) onWrite(this js.Value, args []js.Value) interface{} {
-	console.Call("log")
+	//console.Call("log")
 	return nil
 }
 
 func (l *Logger) onError(this js.Value, args []js.Value) interface{} {
-	window.Call("alert", args[0])
+	console.Call("log", args[0])
+	//window.Call("alert", args[0])
 	return nil
 }
 
@@ -294,14 +297,13 @@ func (l *Logger) PostWaveform(data Waveform) {
 	l.rawFile.Call("createWriter",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			writer := args[0]
-			writer.Set("onwrite", js.FuncOf(l.onWrite))
+			writer.Set("onwriteend", js.FuncOf(l.onWrite))
 			writer.Set("onerror", js.FuncOf(l.onError))
 			writer.Call("seek", writer.Get("length"))
 			writer.Call("write", window.Get("Blob").New(window.Get("Array").New(data)))
 			return nil
 		}),
 	)
-
 }
 
 // PostRri ...
@@ -343,6 +345,7 @@ func (fw *FileWriter) Write(b []byte) (int, error) {
 			writer.Set("onwriteend",
 				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 					ch <- sz
+					close(ch)
 					return nil
 				}),
 			)

@@ -16,6 +16,7 @@ const (
 
 // Callbacks ...
 type Callbacks interface {
+	Disconnected()
 	PostWaveform(data Waveform)
 	PostRri(data Rri)
 	PostEnv(data Env)
@@ -130,6 +131,7 @@ func (ble *BLE) onSetupComplete() error {
 // onDisconnected ...
 func (ble *BLE) onDisconnected(this js.Value, args []js.Value) interface{} {
 	console.Call("log", "disconnected:", ble.device.Get("id"))
+	ble.callbacks.Disconnected()
 	return nil
 }
 

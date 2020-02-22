@@ -1,7 +1,6 @@
 package frontend
 
 import (
-	"log"
 	"strings"
 	"syscall/js"
 
@@ -18,7 +17,7 @@ var (
 
 // Setup ...
 func Setup() {
-	log.Println(navigator.Get("userAgent").String())
+	console.Call("log", navigator.Get("userAgent").String())
 	if strings.Index(navigator.Get("userAgent").String(), "Chrome") < 0 {
 		window.Call("alert", "This Page is Google Chrome base browser only!")
 		return

@@ -2,7 +2,6 @@ package frontend
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/gopherjs/vecty"
@@ -506,7 +505,7 @@ func (c *TopView) Render() vecty.ComponentOrHTML {
 
 // OnClickStart ...
 func (c *TopView) OnClickStart(event *vecty.Event) {
-	log.Println("start")
+	console.Call("log", "start")
 	go func() {
 		if err := c.BLE.Connect(); err != nil {
 			console.Call("log", err.Error())
@@ -525,13 +524,15 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 
 // OnClickStop ...
 func (c *TopView) OnClickStop(event *vecty.Event) {
-	log.Println("stop")
+	console.Call("log", "stop")
 	go func() {
 		c.Logger.Stop()
-		if err := c.BLE.Disconnect(); err != nil {
-			console.Call("log", err.Error())
-			window.Call("alert", err.Error())
-			return
+		if event != nil {
+			if err := c.BLE.Disconnect(); err != nil {
+				console.Call("log", err.Error())
+				window.Call("alert", err.Error())
+				return
+			}
 		}
 		c.Connected = false
 		c.Stoped = true
@@ -542,9 +543,14 @@ func (c *TopView) OnClickStop(event *vecty.Event) {
 // Update ...
 func (c *TopView) Update() {
 	c.FileList.Update(func() {
-		log.Println("render")
+		console.Call("log", "render")
 		vecty.Rerender(c)
 	})
+}
+
+// Disconnected ...
+func (c *TopView) Disconnected() {
+	c.OnClickStop(nil)
 }
 
 // PostWaveform ...
