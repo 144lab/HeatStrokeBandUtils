@@ -510,32 +510,36 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 		c.RawSize = 0
 		c.RriSize = 0
 		c.EnvSize = 0
-		ch := make(chan bool)
+		ch := make(chan js.Value)
 		c.recorder.Call("connect").Call("then",
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				ch <- true
+				ch <- js.Null()
 				return nil
 			}),
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				window.Call("alert", args[0])
-				ch <- true
+				ch <- args[0]
 				return nil
 			}),
 		)
-		<-ch
+		if err := <-ch; err != js.Null() {
+			window.Call("alert", err)
+			return
+		}
 		c.Connected = true
 		c.recorder.Call("start").Call("then",
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				ch <- true
+				ch <- js.Null()
 				return nil
 			}),
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				window.Call("alert", args[0])
-				ch <- true
+				ch <- args[0]
 				return nil
 			}),
 		)
-		<-ch
+		if err := <-ch; err != js.Null() {
+			window.Call("alert", err)
+			return
+		}
 		c.Stoped = false
 		vecty.Rerender(c)
 	}()
@@ -545,32 +549,36 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 func (c *TopView) OnClickStop(event *vecty.Event) {
 	console.Call("log", "stop")
 	go func() {
-		ch := make(chan bool)
+		ch := make(chan js.Value)
 		c.recorder.Call("disconnect").Call("then",
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				ch <- true
+				ch <- js.Null()
 				return nil
 			}),
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				window.Call("alert", args[0])
-				ch <- true
+				ch <- args[0]
 				return nil
 			}),
 		)
-		<-ch
+		if err := <-ch; err != js.Null() {
+			window.Call("alert", err)
+			return
+		}
 		c.Connected = false
 		c.recorder.Call("stop").Call("then",
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				ch <- true
+				ch <- js.Null()
 				return nil
 			}),
 			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				window.Call("alert", args[0])
-				ch <- true
+				ch <- args[0]
 				return nil
 			}),
 		)
-		<-ch
+		if err := <-ch; err != js.Null() {
+			window.Call("alert", err)
+			return
+		}
 		c.Stoped = true
 		c.Update()
 		vecty.Rerender(c)
