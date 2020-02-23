@@ -612,6 +612,7 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 				Timestamp: uint32(args[2].Get("Timestamp").Int()),
 				Rri:       uint16(args[2].Get("Rri").Int()),
 			}
+			vecty.Rerender(c)
 		case "environment.csv":
 			c.EnvSize++
 			c.LastEnv = Env{
@@ -622,10 +623,10 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 				EstTemperature:  args[2].Get("EstTemperature").Float(),
 				BatteryLevel:    uint8(args[2].Get("BatteryLevel").Int()),
 			}
+			vecty.Rerender(c)
 		default:
 			console.Call("log", "unknown file", args[1])
 		}
-		vecty.Rerender(c)
 	}
 	return nil
 }
