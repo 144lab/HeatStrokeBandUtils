@@ -3,6 +3,7 @@ package frontend
 import (
 	"fmt"
 	"strconv"
+	"syscall/js"
 
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
@@ -13,8 +14,7 @@ import (
 // TopView ...
 type TopView struct {
 	vecty.Core
-	Logger    *Logger
-	BLE       *BLE
+	recorder  *Recorder
 	LastRri   Rri       `vecty:"prop"`
 	LastEnv   Env       `vecty:"prop"`
 	Connected bool      `vecty:"prop"`
@@ -28,10 +28,10 @@ type TopView struct {
 // NewTopView ...
 func NewTopView() *TopView {
 	top := &TopView{}
-	top.Logger = NewLogger(top)
-	top.BLE = NewBLE(top)
+	top.recorder = NewRecorder(js.FuncOf(top.Event))
 	top.FileList = &FileList{
-		manager: top.Logger,
+		updater:  top,
+		recorder: top.recorder,
 	}
 	return top
 }
@@ -507,16 +507,35 @@ func (c *TopView) Render() vecty.ComponentOrHTML {
 func (c *TopView) OnClickStart(event *vecty.Event) {
 	console.Call("log", "start")
 	go func() {
-		if err := c.BLE.Connect(); err != nil {
-			console.Call("log", err.Error())
-			window.Call("alert", err.Error())
-			return
-		}
-		c.Logger.Start()
 		c.RawSize = 0
 		c.RriSize = 0
 		c.EnvSize = 0
+		ch := make(chan bool)
+		c.recorder.Call("connect").Call("then",
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				ch <- true
+				return nil
+			}),
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				window.Call("alert", args[0])
+				ch <- true
+				return nil
+			}),
+		)
+		<-ch
 		c.Connected = true
+		c.recorder.Call("start").Call("then",
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				ch <- true
+				return nil
+			}),
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				window.Call("alert", args[0])
+				ch <- true
+				return nil
+			}),
+		)
+		<-ch
 		c.Stoped = false
 		vecty.Rerender(c)
 	}()
@@ -526,18 +545,85 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 func (c *TopView) OnClickStop(event *vecty.Event) {
 	console.Call("log", "stop")
 	go func() {
-		c.Logger.Stop()
-		if event != nil {
-			if err := c.BLE.Disconnect(); err != nil {
-				console.Call("log", err.Error())
-				window.Call("alert", err.Error())
-				return
-			}
-		}
+		ch := make(chan bool)
+		c.recorder.Call("disconnect").Call("then",
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				ch <- true
+				return nil
+			}),
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				window.Call("alert", args[0])
+				ch <- true
+				return nil
+			}),
+		)
+		<-ch
 		c.Connected = false
+		c.recorder.Call("stop").Call("then",
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				ch <- true
+				return nil
+			}),
+			js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				window.Call("alert", args[0])
+				ch <- true
+				return nil
+			}),
+		)
+		<-ch
 		c.Stoped = true
+		c.Update()
 		vecty.Rerender(c)
 	}()
+}
+
+// Event ...
+func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
+	switch args[0].String() {
+	default:
+		console.Call("log", "unknown", args[0])
+	case "construct":
+	case "fsReady":
+		c.Update()
+	case "connected":
+	case "started":
+	case "disconnected":
+	case "stopped":
+		go func() {
+			console.Call("log", "build:", args[1])
+			c.recorder.BuildZIP(args[1].String())
+		}()
+
+	case "record":
+		switch args[1].String() {
+		case "waveform.bin":
+			c.RawSize += 80
+		case "rri.csv":
+			c.RriSize++
+			c.LastRri = Rri{
+				Timestamp: uint32(args[2].Get("Timestamp").Int()),
+				Rri:       uint16(args[2].Get("Rri").Int()),
+			}
+		case "environment.csv":
+			c.EnvSize++
+			c.LastEnv = Env{
+				Timestamp:       uint32(args[2].Get("Timestamp").Int()),
+				Humidity:        args[2].Get("Humidity").Float(),
+				Temperature:     args[2].Get("Temperature").Float(),
+				SkinTemperature: args[2].Get("SkinTemperature").Float(),
+				EstTemperature:  args[2].Get("EstTemperature").Float(),
+				BatteryLevel:    uint8(args[2].Get("BatteryLevel").Int()),
+			}
+		default:
+			console.Call("log", "unknown file", args[1])
+		}
+		vecty.Rerender(c)
+	}
+	return nil
+}
+
+// Mount ...
+func (c *TopView) Mount() {
 }
 
 // Update ...
@@ -551,27 +637,4 @@ func (c *TopView) Update() {
 // Disconnected ...
 func (c *TopView) Disconnected() {
 	c.OnClickStop(nil)
-}
-
-// PostWaveform ...
-func (c *TopView) PostWaveform(data Waveform) {
-	c.Logger.PostWaveform(data)
-	c.RawSize += data.Get("byteLength").Int() / 2
-	vecty.Rerender(c)
-}
-
-// PostRri ...
-func (c *TopView) PostRri(data Rri) {
-	c.Logger.PostRri(data)
-	c.LastRri = data
-	c.RriSize++
-	vecty.Rerender(c)
-}
-
-// PostEnv ...
-func (c *TopView) PostEnv(data Env) {
-	c.Logger.PostEnv(data)
-	c.LastEnv = data
-	c.EnvSize++
-	vecty.Rerender(c)
 }

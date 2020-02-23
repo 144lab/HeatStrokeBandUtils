@@ -10,8 +10,10 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile)
-	frontend.Setup()
-	top := frontend.NewTopView()
-	vecty.RenderBody(top)
+	go func() {
+		frontend.Setup()
+		top := frontend.NewTopView()
+		vecty.RenderBody(top)
+	}()
 	select {}
 }

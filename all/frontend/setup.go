@@ -17,6 +17,7 @@ var (
 
 // Setup ...
 func Setup() {
+	ch := make(chan bool)
 	console.Call("log", navigator.Get("userAgent").String())
 	if strings.Index(navigator.Get("userAgent").String(), "Chrome") < 0 {
 		window.Call("alert", "This Page is Google Chrome base browser only!")
@@ -30,4 +31,14 @@ func Setup() {
 	vecty.AddStylesheet("css/spectre-exp.min.css")
 	vecty.AddStylesheet("css/spectre-icons.min.css")
 	vecty.AddStylesheet("css/app.css")
+	script := document.Call("createElement", "script")
+	script.Set("src", "recorder.js")
+	script.Call("addEventListener", "load",
+		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			close(ch)
+			return nil
+		}),
+	)
+	document.Get("body").Call("appendChild", script)
+	<-ch
 }

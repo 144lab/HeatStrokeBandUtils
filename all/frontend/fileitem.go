@@ -2,9 +2,7 @@ package frontend
 
 import (
 	"fmt"
-	"strconv"
 	"syscall/js"
-	"time"
 
 	"github.com/gopherjs/vecty"
 	"github.com/gopherjs/vecty/elem"
@@ -12,29 +10,38 @@ import (
 	"github.com/gopherjs/vecty/prop"
 )
 
+// FileManager ...
+type FileManager interface {
+	GetEntries(dir string) js.Value
+	GetSize(dir string) int
+	GetURL(dir string) string
+	Delete(dir string)
+}
+
 // FileList ...
 type FileList struct {
 	vecty.Core
-	manager FileManager
-	Items   vecty.List `vecty:"prop"`
+	updater  Updater
+	recorder FileManager
+	Items    vecty.List `vecty:"prop"`
 }
 
 // Update ...
 func (c *FileList) Update(fn func()) {
 	go func() {
-		entries := c.manager.GetDirs()
+		entries := c.recorder.GetEntries("")
+		console.Call("log", entries)
 		var items vecty.List
 		for i := 0; i < entries.Length(); i++ {
 			entry := entries.Index(i)
 			console.Call("log", len(items), entry)
 			idStr := entry.Get("name").String()
-			id, _ := strconv.Atoi(idStr)
 			item := &FileItem{
-				manager: c.manager,
-				ID:      idStr,
-				Title:   time.Unix(int64(id), 0).Format("2006/01/02-15:04:05"),
-				Size:    c.manager.GetSize(idStr),
-				URL:     c.manager.GetURL(idStr),
+				updater:  c.updater,
+				recorder: c.recorder,
+				ID:       idStr,
+				Size:     c.recorder.GetSize(idStr),
+				URL:      c.recorder.GetURL(idStr),
 			}
 			items = append(items, item)
 		}
@@ -80,22 +87,14 @@ func (c *FileList) Render() vecty.ComponentOrHTML {
 	)
 }
 
-// FileManager ...
-type FileManager interface {
-	GetDirs() js.Value
-	GetSize(id string) int64
-	GetURL(id string) string
-	Delete(id string)
-}
-
 // FileItem ...
 type FileItem struct {
 	vecty.Core
-	manager FileManager
-	Title   string `vecty:"prop"`
-	Size    int64  `vecty:"prop"`
-	ID      string `vecty:"prop"`
-	URL     string `vecty:"prop"`
+	updater  Updater
+	recorder FileManager
+	Size     int    `vecty:"prop"`
+	ID       string `vecty:"prop"`
+	URL      string `vecty:"prop"`
 }
 
 // Render ...
@@ -120,7 +119,7 @@ func (c *FileItem) Render() vecty.ComponentOrHTML {
 						"h5":         true,
 					},
 				),
-				vecty.Text(c.Title),
+				vecty.Text(c.ID),
 			),
 		),
 		elem.Div(
@@ -166,6 +165,9 @@ func (c *FileItem) Render() vecty.ComponentOrHTML {
 
 func (c *FileItem) onDeleteClick(event *vecty.Event) {
 	if window.Call("confirm", "delete?").Bool() {
-		c.manager.Delete(c.ID)
+		go func() {
+			c.recorder.Delete(c.ID)
+			c.updater.Update()
+		}()
 	}
 }
