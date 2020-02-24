@@ -32,3 +32,10 @@ deploy:
 	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js $(DSTDIR)/wasm_exec.js
 	cp recorder.js $(DSTDIR)/recorder.js
 	cp -Rf css $(DSTDIR)/
+
+gopherjs:
+	GOPHERJS_GOROOT=$(shell go1.12.17 env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go gopherjs build -o main.js .
+
+gopherjs-run:
+	GOPHERJS_GOROOT=$(shell go1.12.17 env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go \
+	gopherjs serve hrm-logger

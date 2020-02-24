@@ -1,6 +1,7 @@
 package frontend
 
 import (
+	"log"
 	"strings"
 	"syscall/js"
 
@@ -39,6 +40,12 @@ func Setup() {
 			return nil
 		}),
 	)
-	document.Get("body").Call("appendChild", script)
+	window.Call("addEventListener", "DOMContentLoaded",
+		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			log.Print("contentloaded")
+			document.Get("body").Call("appendChild", script)
+			return nil
+		}),
+	)
 	<-ch
 }

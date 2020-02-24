@@ -10,6 +10,11 @@ import (
 	"github.com/gopherjs/vecty/prop"
 )
 
+// Updater ...
+type Updater interface {
+	Update()
+}
+
 // FileManager ...
 type FileManager interface {
 	GetEntries(dir string) js.Value
@@ -90,11 +95,12 @@ func (c *FileList) Render() vecty.ComponentOrHTML {
 // FileItem ...
 type FileItem struct {
 	vecty.Core
-	updater  Updater
-	recorder FileManager
-	Size     int    `vecty:"prop"`
-	ID       string `vecty:"prop"`
-	URL      string `vecty:"prop"`
+	updater     Updater
+	recorder    FileManager
+	Size        int    `vecty:"prop"`
+	ID          string `vecty:"prop"`
+	URL         string `vecty:"prop"`
+	ZipComplete bool   `vecty:"prop"`
 }
 
 // Render ...
