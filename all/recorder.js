@@ -207,7 +207,9 @@ class HrmRecorder {
   }
 
   async disconnect() {
-    await this.device.gatt.disconnect();
+    if (this.device) {
+      await this.device.gatt.disconnect();
+    }
   }
 
   async start() {
@@ -235,12 +237,14 @@ class HrmRecorder {
   }
 
   async stop() {
-    const path = this.current.fullPath;
-    this.current = null;
-    this.rawFile = null;
-    this.rriFile = null;
-    this.envFile = null;
-    this.dispatcher("stopped", path);
+    if (this.current) {
+      const path = this.current.fullPath;
+      this.current = null;
+      this.rawFile = null;
+      this.rriFile = null;
+      this.envFile = null;
+      this.dispatcher("stopped", path);
+    }
   }
 
   async postRaw(s) {
