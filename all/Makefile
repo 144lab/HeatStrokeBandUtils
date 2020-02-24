@@ -34,8 +34,6 @@ deploy:
 	cp -Rf css $(DSTDIR)/
 
 gopherjs:
-	GOPHERJS_GOROOT=$(shell go1.12.17 env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go gopherjs build -o main.js .
-
-gopherjs-run:
-	GOPHERJS_GOROOT=$(shell go1.12.17 env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go \
-	gopherjs serve hrm-logger
+	docker build --rm -t localhost/gopherjs docker
+	docker run -it --rm -v $$PWD:/go/src/hrm-logger -w /go/src/hrm-logger localhost/gopherjs \
+	/go/bin/gopherjs build -o main.js .

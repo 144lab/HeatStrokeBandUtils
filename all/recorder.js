@@ -207,9 +207,7 @@ class HrmRecorder {
   }
 
   async disconnect() {
-    if (this.device) {
-      await this.device.gatt.disconnect();
-    }
+    await this.device.gatt.disconnect();
   }
 
   async start() {
