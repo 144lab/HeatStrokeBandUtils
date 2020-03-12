@@ -2,9 +2,8 @@ package frontend
 
 import (
 	"archive/zip"
+	"path/filepath"
 	"syscall/js"
-
-	gjs "github.com/gopherjs/gopherjs/js"
 )
 
 // Recorder ...
@@ -61,7 +60,7 @@ func (r *Recorder) Delete(dir string) {
 }
 
 // GetURL ...
-func (r *Recorder) GetURL(dir string) string {
+func (r *Recorder) GetURL(d string) string {
 	ch := make(chan string, 1)
 	resolve := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ch <- args[0].Call("toURL").String()
@@ -75,7 +74,7 @@ func (r *Recorder) GetURL(dir string) string {
 	defer reject.Release()
 	success := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		dir := args[0]
-		dir.Call("getFile", "data.zip", nil, resolve, reject)
+		dir.Call("getFile", d+".zip", nil, resolve, reject)
 		return nil
 	})
 	defer success.Release()
@@ -84,17 +83,18 @@ func (r *Recorder) GetURL(dir string) string {
 		return nil
 	})
 	defer fail.Release()
-	r.GetFS().Get("root").Call("getDirectory", dir, nil, success, fail)
+	r.GetFS().Get("root").Call("getDirectory", d, nil, success, fail)
 	return <-ch
 }
 
 // BuildZIP ...
-func (r *Recorder) BuildZIP(dir string) string {
+func (r *Recorder) BuildZIP(d string) string {
+	fn := filepath.Base(d)
 	ch := make(chan string, 1)
-	r.GetFS().Get("root").Call("getDirectory", dir, nil,
+	r.GetFS().Get("root").Call("getDirectory", d, nil,
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			dir := args[0]
-			dir.Call("getFile", "data.zip", map[string]interface{}{"create": true},
+			dir.Call("getFile", fn+".zip", map[string]interface{}{"create": true},
 				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 					zipFile := args[0]
 					zipFile.Call("createWriter",
@@ -131,9 +131,9 @@ func (r *Recorder) BuildZIP(dir string) string {
 																				console.Call("log", err.Error())
 																				return
 																			}
-																			b := gjs.Global.Get("Uint8Array").New(result).Interface().([]byte)
-																			//b := make([]byte, sz)
-																			//js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
+																			//b := gjs.Global.Get("Uint8Array").New(result).Interface().([]byte)
+																			b := make([]byte, sz)
+																			js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
 																			if _, err := f.Write(b); err != nil {
 																				console.Call("log", err.Error())
 																				return
@@ -186,11 +186,11 @@ func (fw *FileWriter) Close() error {
 }
 
 func (fw *FileWriter) Write(b []byte) (int, error) {
-	//ua := window.Get("Uint8Array").New(len(b))
-	//sz := js.CopyBytesToJS(ua, b)
-	ua := js.TypedArrayOf(b)
-	sz := len(b)
-	defer ua.Release()
+	ua := window.Get("Uint8Array").New(len(b))
+	sz := js.CopyBytesToJS(ua, b)
+	//ua := js.TypedArrayOf(b)
+	//sz := len(b)
+	//defer ua.Release()
 	ch := make(chan int, 1)
 	writeend := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ch <- sz

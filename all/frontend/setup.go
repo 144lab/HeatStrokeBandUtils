@@ -40,12 +40,12 @@ func Setup() {
 			return nil
 		}),
 	)
-	window.Call("addEventListener", "DOMContentLoaded",
-		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			log.Print("contentloaded")
-			document.Get("body").Call("appendChild", script)
-			return nil
-		}),
-	)
+	//window.Call("addEventListener", "DOMContentLoaded",
+	//	js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	log.Print("contentloaded")
+	document.Get("body").Call("appendChild", script)
+	//		return nil
+	//	}),
+	//)
 	<-ch
 }

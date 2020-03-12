@@ -15,5 +15,5 @@ func main() {
 		top := frontend.NewTopView()
 		vecty.RenderBody(top)
 	}()
-	//select {}
+	select {}
 }

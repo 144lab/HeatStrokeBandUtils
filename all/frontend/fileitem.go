@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"log"
 	"syscall/js"
 
 	"github.com/gopherjs/vecty"
@@ -35,7 +36,7 @@ type FileList struct {
 func (c *FileList) Update(fn func()) {
 	go func() {
 		entries := c.recorder.GetEntries("")
-		console.Call("log", entries)
+		console.Call("log", "entries:", entries)
 		var items vecty.List
 		for i := 0; i < entries.Length(); i++ {
 			entry := entries.Index(i)
@@ -48,6 +49,7 @@ func (c *FileList) Update(fn func()) {
 				Size:     c.recorder.GetSize(idStr),
 				URL:      c.recorder.GetURL(idStr),
 			}
+			log.Printf("%v", item)
 			items = append(items, item)
 		}
 		c.Items = items
@@ -153,7 +155,7 @@ func (c *FileItem) Render() vecty.ComponentOrHTML {
 							"disabled":    len(c.URL) == 0,
 						},
 						prop.Href(c.URL),
-						vecty.Attribute("download", "data.zip"),
+						vecty.Attribute("download", c.ID+".zip"),
 					),
 					vecty.Text("Download"),
 				),

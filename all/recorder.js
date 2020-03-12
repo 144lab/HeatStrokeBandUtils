@@ -27,6 +27,7 @@ class HrmRecorder {
   constructor(evnetDispatcher) {
     this.dispatcher = evnetDispatcher;
     this.fs = null;
+    this.errCount = 0;
     this.device = null;
     this.server = null;
     this.service = null;
@@ -163,12 +164,32 @@ class HrmRecorder {
     });
   }
 
-  async connect() {
-    this.device = await navigator.bluetooth.requestDevice({
+  async getDevice() {
+    return await navigator.bluetooth.requestDevice({
       filters: [{ services: [serviceUUID] }]
     });
+  }
+
+  async connect(device = null) {
+    if (device != null) {
+      this.device = device;
+    }
+    if (this.device == null) {
+      throw Error("no device");
+    }
+    console.log(this.device.id);
     this.device.addEventListener("gattserverdisconnected", event => {
-      this.dispatcher("disconnected");
+      if (this.errCount > 300) {
+        this.dispatcher("disconnected");
+        return;
+      }
+      this.errCount++;
+      setTimeout(() => {
+        if (this.device != null) {
+          console.log("reconnect...");
+          this.connect(this.device);
+        }
+      }, 1000);
     });
     this.server = await this.device.gatt.connect();
     this.service = await this.server.getPrimaryService(serviceUUID);
@@ -208,12 +229,14 @@ class HrmRecorder {
 
   async disconnect() {
     if (this.device) {
-      await this.device.gatt.disconnect();
+      var device = this.device;
+      this.device = null;
+      await device.gatt.disconnect();
     }
   }
 
   async start() {
-    const current = formatDate(new Date(), "YYYY-MM-DD_HH:MM:SS");
+    const current = formatDate(new Date(), "YYYYMMDD_HHMMSS");
     console.log("mkdir:", current);
     this.current = await new Promise(resolve => {
       this.fs.root.getDirectory(current, { create: true }, dir => resolve(dir));

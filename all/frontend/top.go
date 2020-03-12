@@ -50,14 +50,27 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 			return nil
 		})
 		defer fail.Release()
-		c.recorder.Call("connect").Call("then", success, fail)
-		if err := <-ch; err != js.Null() {
+		var device js.Value
+		success2 := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			device = args[0]
+			ch <- js.Null()
+			return nil
+		})
+		defer success2.Release()
+		c.recorder.Call("getDevice").Call("then", success2, fail)
+		if err := <-ch; !err.IsNull() {
+			window.Call("alert", err)
+			return
+		}
+		console.Call("log", device)
+		c.recorder.Call("connect", device).Call("then", success, fail)
+		if err := <-ch; !err.IsNull() {
 			window.Call("alert", err)
 			return
 		}
 		c.Connected = true
 		c.recorder.Call("start").Call("then", success, fail)
-		if err := <-ch; err != js.Null() {
+		if err := <-ch; !err.IsNull() {
 			window.Call("alert", err)
 			return
 		}
@@ -83,13 +96,13 @@ func (c *TopView) OnClickStop(event *vecty.Event) {
 		})
 		defer fail.Release()
 		c.recorder.Call("disconnect").Call("then", success, fail)
-		if err := <-ch; err != js.Null() {
+		if err := <-ch; !err.IsNull() {
 			window.Call("alert", err)
 			return
 		}
 		c.Connected = false
 		c.recorder.Call("stop").Call("then", success, fail)
-		if err := <-ch; err != js.Null() {
+		if err := <-ch; !err.IsNull() {
 			window.Call("alert", err)
 			return
 		}
