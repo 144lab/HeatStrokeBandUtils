@@ -21,8 +21,16 @@ override define index_html
 </script>
 endef
 
-run:
+run: clean
 	wasmserve
+
+clean:
+	rm wasm_exec.js main.wasm index.html
+
+update: deploy
+	cp $(DSTDIR)/wasm_exec.js ./
+	cp $(DSTDIR)/main.wasm ./
+	cp $(DSTDIR)/index.html ./
 
 deploy:
 	@echo "deploy: $(SRCDIR) -> $(DSTDIR)"

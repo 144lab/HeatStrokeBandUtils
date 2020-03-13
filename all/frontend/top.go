@@ -10,15 +10,16 @@ import (
 // TopView ...
 type TopView struct {
 	vecty.Core
-	recorder  *Recorder
-	LastRri   Rri       `vecty:"prop"`
-	LastEnv   Env       `vecty:"prop"`
-	Connected bool      `vecty:"prop"`
-	Stopped   bool      `vecty:"prop"`
-	RawSize   int       `vecty:"prop"`
-	RriSize   int       `vecty:"prop"`
-	EnvSize   int       `vecty:"prop"`
-	FileList  *FileList `vecty:"prop"`
+	recorder         *Recorder
+	FirmwareRevision string    `vecty:prop`
+	LastRri          Rri       `vecty:"prop"`
+	LastEnv          Env       `vecty:"prop"`
+	Connected        bool      `vecty:"prop"`
+	Stopped          bool      `vecty:"prop"`
+	RawSize          int       `vecty:"prop"`
+	RriSize          int       `vecty:"prop"`
+	EnvSize          int       `vecty:"prop"`
+	FileList         *FileList `vecty:"prop"`
 }
 
 // NewTopView ...
@@ -76,6 +77,7 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 		}
 		c.Stopped = false
 		log.Println(c.Connected, c.Stopped)
+		c.FirmwareRevision = c.recorder.GetVersion()
 		vecty.Rerender(c)
 	}()
 }

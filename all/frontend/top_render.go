@@ -268,6 +268,42 @@ func (c *TopView) Render() vecty.ComponentOrHTML {
 							vecty.Markup(
 								vecty.Class("form-label"),
 							),
+							vecty.Text("Firmware Revision"),
+						),
+					),
+					elem.Div(
+						vecty.Markup(
+							vecty.ClassMap{
+								"col-10":    true,
+								"col-sm-12": true,
+							},
+						),
+						elem.Input(
+							vecty.Markup(
+								vecty.Class("form-input"),
+								prop.Type("text"),
+								prop.Placeholder("unknown"),
+								vecty.Attribute("readonly", "true"),
+								prop.Value(c.FirmwareRevision),
+							),
+						),
+					),
+				),
+				elem.Div(
+					vecty.Markup(
+						vecty.Class("form-group"),
+					),
+					elem.Div(
+						vecty.Markup(
+							vecty.ClassMap{
+								"col-2":     true,
+								"col-sm-12": true,
+							},
+						),
+						elem.Label(
+							vecty.Markup(
+								vecty.Class("form-label"),
+							),
 							vecty.Text("RRI"),
 						),
 					),

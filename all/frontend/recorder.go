@@ -18,6 +18,11 @@ func NewRecorder(handler js.Func) *Recorder {
 	}
 }
 
+// GetVersion ...
+func (r *Recorder) GetVersion() string {
+	return r.Value.Get("firmwareRevString").String()
+}
+
 // GetFS ...
 func (r *Recorder) GetFS() js.Value {
 	return r.Value.Call("getFS")
@@ -87,90 +92,96 @@ func (r *Recorder) GetURL(d string) string {
 	return <-ch
 }
 
+func (r *Recorder) writeZIP(dir, zipFile js.Value) string {
+	syncCh := make(chan bool)
+	w := &FileWriter{file: zipFile}
+	zw := zip.NewWriter(w)
+	for _, name := range []string{
+		"waveform.bin",
+		"rri.csv",
+		"environment.csv",
+		"VERSION",
+	} {
+		var funcs []js.Func
+		funcs = append(funcs, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			file := args[0]
+			funcs = append(funcs, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				reader := window.Get("FileReader").New()
+				funcs = append(funcs, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+					go func() {
+						defer func() { syncCh <- true }()
+						result := args[0].Get("target").Get("result")
+						sz := result.Get("byteLength").Int()
+						console.Call("log", "add zip:", file.Get("name"), sz)
+						if sz > 0 {
+							f, err := zw.Create(file.Get("name").String())
+							if err != nil {
+								console.Call("log", err.Error())
+								return
+							}
+							//b := gjs.Global.Get("Uint8Array").New(result).Interface().([]byte)
+							b := make([]byte, sz)
+							js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
+							if _, err := f.Write(b); err != nil {
+								console.Call("log", err.Error())
+								return
+							}
+						}
+					}()
+					return nil
+				}))
+				reader.Set("onloadend", funcs[2])
+				reader.Call("readAsArrayBuffer", args[0])
+				return nil
+			}))
+			file.Call("file", funcs[1])
+			return nil
+		}))
+		dir.Call("getFile", name, nil, funcs[0])
+		<-syncCh
+		for _, f := range funcs {
+			f.Release()
+		}
+	}
+	if err := zw.Close(); err != nil {
+		console.Call("log", "Zip Failed:", err.Error())
+		window.Call("alert", err.Error())
+		return ""
+	}
+	return zipFile.Call("toURL").String()
+}
+
 // BuildZIP ...
 func (r *Recorder) BuildZIP(d string) string {
 	fn := filepath.Base(d)
 	ch := make(chan string, 1)
-	r.GetFS().Get("root").Call("getDirectory", d, nil,
-		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			dir := args[0]
-			dir.Call("getFile", fn+".zip", map[string]interface{}{"create": true},
-				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-					zipFile := args[0]
-					zipFile.Call("createWriter",
-						js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-							writer := args[0]
-							writer.Set("onwriteend",
-								js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-									go func() {
-										defer func() { ch <- zipFile.Call("toURL").String() }()
-										syncCh := make(chan bool, 3)
-										w := &FileWriter{file: zipFile}
-										zw := zip.NewWriter(w)
-										for _, name := range []string{
-											"waveform.bin",
-											"rri.csv",
-											"environment.csv",
-										} {
-											dir.Call("getFile", name, nil,
-												js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-													file := args[0]
-													file.Call("file",
-														js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-															reader := window.Get("FileReader").New()
-															reader.Set("onloadend",
-																js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-																	go func() {
-																		defer func() { syncCh <- true }()
-																		result := args[0].Get("target").Get("result")
-																		sz := result.Get("byteLength").Int()
-																		if sz > 0 {
-																			console.Call("log", "add zip:", file.Get("name"), sz)
-																			f, err := zw.Create(file.Get("name").String())
-																			if err != nil {
-																				console.Call("log", err.Error())
-																				return
-																			}
-																			//b := gjs.Global.Get("Uint8Array").New(result).Interface().([]byte)
-																			b := make([]byte, sz)
-																			js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
-																			if _, err := f.Write(b); err != nil {
-																				console.Call("log", err.Error())
-																				return
-																			}
-																		}
-																	}()
-																	return nil
-																}),
-															)
-															reader.Call("readAsArrayBuffer", args[0])
-															return nil
-														}),
-													)
-													return nil
-												}),
-											)
-											<-syncCh
-										}
-										if err := zw.Close(); err != nil {
-											console.Call("log", "Zip Failed:", err.Error())
-											return
-										}
-										console.Call("log", "Done")
-									}()
-									return nil
-								}),
-							)
-							writer.Call("truncate", 0)
-							return nil
-						}),
-					)
+	var funcs []js.Func
+	funcs = append(funcs, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		dir := args[0]
+		funcs = append(funcs, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			zipFile := args[0]
+			funcs = append(funcs, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				writer := args[0]
+				funcs = append(funcs, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+					go func() { ch <- r.writeZIP(dir, zipFile) }()
 					return nil
-				}),
-			)
+				}))
+				writer.Set("onwriteend", funcs[3])
+				writer.Call("truncate", 0)
+				return nil
+			}))
+			zipFile.Call("createWriter", funcs[2])
 			return nil
-		}),
-	)
+		}))
+		dir.Call("getFile", fn+".zip", map[string]interface{}{"create": true}, funcs[1])
+		return nil
+	}))
+	defer func() {
+		for _, f := range funcs {
+			f.Release()
+		}
+	}()
+	r.GetFS().Get("root").Call("getDirectory", d, nil, funcs[0])
 	return <-ch
 }
 
