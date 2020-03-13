@@ -309,13 +309,20 @@ class HrmRecorder {
     const data = new DataView(s);
     const tm = data.getUint32(0, true);
     const rri = data.getUint16(4, true);
+    const led = data.getUint8(6);
+    const seq = data.getUint8(7);
     if (this.rriFile != null) {
       const file = this.rriFile;
       await this._write(
         file,
-        new Blob([[String(tm), String(rri)].join(",") + "\n"], {
-          type: "text/csv"
-        })
+        new Blob(
+          [
+            [String(tm), String(rri), String(led), String(seq)].join(",") + "\n"
+          ],
+          {
+            type: "text/csv"
+          }
+        )
       );
       this.dispatcher("record", file.name, {
         Timestamp: tm,
