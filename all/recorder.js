@@ -4,7 +4,10 @@ const rawNotifyUUID = "5008e0bd-3581-4d4c-a6d8-c257a369e189";
 const rriNotifyUUID = "b84ea3e8-b237-4b95-a394-6911180b7638";
 const envNotifyUUID = "62fbd229-6edd-4d1a-b554-5c4e1bb29169";
 
-const fileNames = ["waveform.bin", "rri.csv", "environment.csv"];
+const deviceInfoUUID = 0x180a;
+const firmwareRevUUID = 0x2a26;
+
+const fileNames = ["waveform.bin", "rri.csv", "environment.csv", "VERSION"];
 
 // QuotaSize 一時保存ファイルシステム容量
 const QuotaSize = 200 * 1024 * 1024; // 200MiB
@@ -30,6 +33,7 @@ class HrmRecorder {
     this.errCount = 0;
     this.device = null;
     this.server = null;
+    this.firmwareRevString = "unknown";
     this.service = null;
     this.write = null;
     this.rawNotify = null;
@@ -166,7 +170,8 @@ class HrmRecorder {
 
   async getDevice() {
     return await navigator.bluetooth.requestDevice({
-      filters: [{ services: [serviceUUID] }]
+      filters: [{ services: [serviceUUID] }],
+      optionalServices: [deviceInfoUUID]
     });
   }
 
@@ -193,6 +198,15 @@ class HrmRecorder {
     });
     this.server = await this.device.gatt.connect();
     this.service = await this.server.getPrimaryService(serviceUUID);
+    try {
+      let deviceinfo = await this.server.getPrimaryService(
+        "device_information"
+      );
+      let firmwareRev = await deviceinfo.getCharacteristic(firmwareRevUUID);
+      this.firmwareRevString = new TextDecoder().decode(
+        (await firmwareRev.readValue()).buffer
+      );
+    } catch {}
     this.write = await this.service.getCharacteristic(writeUUID);
     this.rawNotify = await this.service.getCharacteristic(rawNotifyUUID);
     this.rawNotify.addEventListener(
@@ -256,6 +270,15 @@ class HrmRecorder {
         this._error(e);
       });
     });
+    let versionFile = await new Promise(async (resolve, reject) => {
+      this.current.getFile(fileNames[3], { create: true }, resolve, e => {
+        this._error(e);
+      });
+    });
+    this._write(
+      versionFile,
+      new Blob([this.firmwareRevString], { type: "text/plain" })
+    );
     this.dispatcher("started", this.current.fullPath);
   }
 
