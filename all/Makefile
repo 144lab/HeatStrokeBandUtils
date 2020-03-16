@@ -43,8 +43,13 @@ deploy:
 	cp nosleep.min.js $(DSTDIR)/nosleep.min.js
 	cp -Rf css $(DSTDIR)/
 
-gopherjs:
+_gopherjs:
 	GOPHERJS_GOROOT=$(shell $(GO) env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go gopherjs build -o main.js .
+
+gopherjs:
+	docker build --rm -t localhost/gopherjs docker
+	docker run -it --rm -v $$PWD:/go/src/hrm-logger -w /go/src/hrm-logger localhost/gopherjs \
+	/go/bin/gopherjs build -o main.js .
 
 gopherjs-run:
 	GOPHERJS_GOROOT=$(shell $(GO) env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go \
