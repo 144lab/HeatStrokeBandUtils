@@ -48,6 +48,7 @@ _gopherjs:
 
 gopherjs:
 	docker build --rm -t localhost/gopherjs docker
+	go mod vendor
 	docker run -it --rm -v $$PWD:/go/src/hrm-logger -w /go/src/hrm-logger localhost/gopherjs \
 	/go/bin/gopherjs build -o main.js .
 

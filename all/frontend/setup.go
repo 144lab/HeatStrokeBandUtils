@@ -32,24 +32,31 @@ func Setup() {
 	vecty.AddStylesheet("css/spectre-exp.min.css")
 	vecty.AddStylesheet("css/spectre-icons.min.css")
 	vecty.AddStylesheet("css/app.css")
-	script := document.Call("createElement", "script")
-	script.Set("src", "nosleep.min.js")
-	script.Call("addEventListener", "load",
+	window.Call("addEventListener", "DOMContentLoaded",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			window.Get("NoSleep").New().Call("enable")
+			script := document.Call("createElement", "script")
+			script.Set("src", "nosleep.min.js")
+			script.Call("addEventListener", "load",
+				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+					window.Get("NoSleep").New().Call("enable")
+					return nil
+				}),
+			)
+			document.Get("body").Call("appendChild", script)
+			script = document.Call("createElement", "script")
+			script.Set("src", "recorder.js")
+			script.Call("addEventListener", "load",
+				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+					close(ch)
+					return nil
+				}),
+			)
+			log.Print("contentloaded")
+			document.Get("body").Call("appendChild", script)
 			return nil
 		}),
 	)
-	document.Get("body").Call("appendChild", script)
-	script = document.Call("createElement", "script")
-	script.Set("src", "recorder.js")
-	script.Call("addEventListener", "load",
-		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			close(ch)
-			return nil
-		}),
-	)
-	document.Get("body").Call("appendChild", script)
-	log.Print("contentloaded")
+	//document.Get("body").Call("appendChild", script)
+	//log.Print("contentloaded")
 	<-ch
 }

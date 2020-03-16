@@ -241,6 +241,7 @@ class HrmRecorder {
     await this.envNotify.startNotifications();
     if (this.server.connected) {
       this.dispatcher("connected");
+      this.errCount = 0;
     }
   }
 
