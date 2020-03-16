@@ -176,6 +176,9 @@ class HrmRecorder {
   }
 
   async connect(device = null) {
+    if (this.device != null) {
+      await this.device.gatt.disconnect();
+    }
     if (device != null) {
       this.device = device;
     }
@@ -184,7 +187,7 @@ class HrmRecorder {
     }
     console.log(this.device.id);
     this.device.addEventListener("gattserverdisconnected", event => {
-      if (this.errCount > 300) {
+      if (this.errCount > 100) {
         this.dispatcher("disconnected");
         return;
       }
@@ -194,7 +197,7 @@ class HrmRecorder {
           console.log("reconnect...");
           this.connect(this.device);
         }
-      }, 1000);
+      }, 3000);
     });
     this.server = await this.device.gatt.connect();
     this.service = await this.server.getPrimaryService(serviceUUID);

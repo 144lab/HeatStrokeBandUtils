@@ -33,6 +33,15 @@ func Setup() {
 	vecty.AddStylesheet("css/spectre-icons.min.css")
 	vecty.AddStylesheet("css/app.css")
 	script := document.Call("createElement", "script")
+	script.Set("src", "nosleep.min.js")
+	script.Call("addEventListener", "load",
+		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			window.Get("NoSleep").New().Call("enable")
+			return nil
+		}),
+	)
+	document.Get("body").Call("appendChild", script)
+	script = document.Call("createElement", "script")
 	script.Set("src", "recorder.js")
 	script.Call("addEventListener", "load",
 		js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -40,12 +49,7 @@ func Setup() {
 			return nil
 		}),
 	)
-	//window.Call("addEventListener", "DOMContentLoaded",
-	//	js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-	log.Print("contentloaded")
 	document.Get("body").Call("appendChild", script)
-	//		return nil
-	//	}),
-	//)
+	log.Print("contentloaded")
 	<-ch
 }

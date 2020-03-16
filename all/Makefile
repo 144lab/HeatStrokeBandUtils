@@ -39,6 +39,7 @@ deploy:
 	echo "$$index_html" > $(DSTDIR)/index.html
 	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js $(DSTDIR)/wasm_exec.js
 	cp recorder.js $(DSTDIR)/recorder.js
+	cp nosleep.min.js $(DSTDIR)/nosleep.min.js
 	cp -Rf css $(DSTDIR)/
 
 gopherjs:
