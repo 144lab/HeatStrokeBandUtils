@@ -1,5 +1,6 @@
 SRCDIR := $(shell pwd)
 DSTDIR := dist
+GO := go1.12.17
 
 export index_html
 override define index_html
@@ -35,16 +36,16 @@ update: deploy
 deploy:
 	@echo "deploy: $(SRCDIR) -> $(DSTDIR)"
 	mkdir -p $(DSTDIR)
-	GO111MODULE=on GOOS=js GOARCH=wasm go build -o $(DSTDIR)/main.wasm .
+	GO111MODULE=on GOOS=js GOARCH=wasm $(GO) build -o $(DSTDIR)/main.wasm .
 	echo "$$index_html" > $(DSTDIR)/index.html
-	cp $(shell go env GOROOT)/misc/wasm/wasm_exec.js $(DSTDIR)/wasm_exec.js
+	cp $(shell $(GO) env GOROOT)/misc/wasm/wasm_exec.js $(DSTDIR)/wasm_exec.js
 	cp recorder.js $(DSTDIR)/recorder.js
 	cp nosleep.min.js $(DSTDIR)/nosleep.min.js
 	cp -Rf css $(DSTDIR)/
 
 gopherjs:
-	GOPHERJS_GOROOT=$(shell go1.12.17 env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go gopherjs build -o main.js .
+	GOPHERJS_GOROOT=$(shell $(GO) env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go gopherjs build -o main.js .
 
 gopherjs-run:
-	GOPHERJS_GOROOT=$(shell go1.12.17 env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go \
+	GOPHERJS_GOROOT=$(shell $(GO) env GOROOT) GOPATH=$(shell cd ../..;pwd):$(HOME)/go \
 	gopherjs serve hrm-logger

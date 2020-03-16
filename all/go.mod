@@ -1,7 +1,5 @@
 module hrm-logger
 
-go 1.14
+go 1.13
 
-require (
-	github.com/gopherjs/vecty v0.0.0-20200301031729-eafd720f09ee
-)
+require github.com/gopherjs/vecty v0.0.0-20191227222824-6a0a25ee5a96

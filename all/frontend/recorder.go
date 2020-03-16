@@ -119,9 +119,9 @@ func (r *Recorder) writeZIP(dir, zipFile js.Value) string {
 								console.Call("log", err.Error())
 								return
 							}
+							// for GopherJS
 							//b := gjs.Global.Get("Uint8Array").New(result).Interface().([]byte)
-							b := make([]byte, sz)
-							js.CopyBytesToGo(b, window.Get("Uint8Array").New(result))
+							b := Uint8ArrayToSlice(window.Get("Uint8Array").New(result))
 							if _, err := f.Write(b); err != nil {
 								console.Call("log", err.Error())
 								return
@@ -197,11 +197,11 @@ func (fw *FileWriter) Close() error {
 }
 
 func (fw *FileWriter) Write(b []byte) (int, error) {
-	ua := window.Get("Uint8Array").New(len(b))
-	sz := js.CopyBytesToJS(ua, b)
-	//ua := js.TypedArrayOf(b)
-	//sz := len(b)
-	//defer ua.Release()
+	//ua := window.Get("Uint8Array").New(len(b))
+	//sz := js.CopyBytesToJS(ua, b)
+	ua := js.TypedArrayOf(b)
+	sz := len(b)
+	defer ua.Release()
 	ch := make(chan int, 1)
 	writeend := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ch <- sz

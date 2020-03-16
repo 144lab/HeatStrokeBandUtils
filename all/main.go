@@ -13,7 +13,7 @@ func main() {
 	go func() {
 		frontend.Setup()
 		top := frontend.NewTopView()
-		vecty.RenderBody(top)
+		vecty.RenderBody(vecty.Component(top))
 	}()
-	select {}
+	//select {}
 }
