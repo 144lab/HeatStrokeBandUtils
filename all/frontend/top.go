@@ -36,6 +36,7 @@ func NewTopView() *TopView {
 // OnClickStart ...
 func (c *TopView) OnClickStart(event *vecty.Event) {
 	console.Call("log", "start")
+	window.Get("noSleep").Call("enable")
 	go func() {
 		c.RawSize = 0
 		c.RriSize = 0
@@ -88,6 +89,7 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 // OnClickStop ...
 func (c *TopView) OnClickStop(event *vecty.Event) {
 	console.Call("log", "stop")
+	window.Get("noSleep").Call("disable")
 	go func() {
 		ch := make(chan js.Value)
 		success := js.FuncOf(func(this js.Value, args []js.Value) interface{} {

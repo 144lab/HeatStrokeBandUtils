@@ -38,7 +38,7 @@ func Setup() {
 			script.Set("src", "nosleep.min.js")
 			script.Call("addEventListener", "load",
 				js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-					window.Get("NoSleep").New().Call("enable")
+					window.Set("noSleep", window.Get("NoSleep").New())
 					return nil
 				}),
 			)

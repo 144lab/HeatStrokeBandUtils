@@ -30765,13 +30765,13 @@ $packages["hrm-logger/frontend"] = (function() {
 			script = $clone(_r$6, js.Value);
 			$r = $clone(script, js.Value).Set("src", new $String("nosleep.min.js")); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			_r$7 = $clone(script, js.Value).Call("addEventListener", new sliceType([new $String("load"), (x$1 = js.FuncOf((function(ch) { return function $b(this$2, args$1) {
-				var _r$7, _r$8, args$1, this$2, $s, $r;
-				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$7 = $f._r$7; _r$8 = $f._r$8; args$1 = $f.args$1; this$2 = $f.this$2; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+				var _arg, _r$7, args$1, this$2, x$2, $s, $r;
+				/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _arg = $f._arg; _r$7 = $f._r$7; args$1 = $f.args$1; this$2 = $f.this$2; x$2 = $f.x$2; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 				_r$7 = $clone($clone(window, js.Value).Get("NoSleep"), js.Value).New(new sliceType([])); /* */ $s = 1; case 1: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-				_r$8 = $clone(_r$7, js.Value).Call("enable", new sliceType([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-				_r$8;
+				_arg = (x$2 = _r$7, new x$2.constructor.elem(x$2));
+				$r = $clone(window, js.Value).Set("noSleep", _arg); /* */ $s = 2; case 2: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 				$s = -1; return $ifaceNil;
-				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._r$7 = _r$7; $f._r$8 = _r$8; $f.args$1 = args$1; $f.this$2 = this$2; $f.$s = $s; $f.$r = $r; return $f;
+				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f._arg = _arg; $f._r$7 = _r$7; $f.args$1 = args$1; $f.this$2 = this$2; $f.x$2 = x$2; $f.$s = $s; $f.$r = $r; return $f;
 			}; })(ch)), new x$1.constructor.elem(x$1))])); /* */ $s = 3; case 3: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
 			_r$7;
 			_r$8 = $clone($clone(document, js.Value).Get("body"), js.Value).Call("appendChild", new sliceType([new script.constructor.elem(script)])); /* */ $s = 4; case 4: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
@@ -30810,15 +30810,17 @@ $packages["hrm-logger/frontend"] = (function() {
 	};
 	$pkg.NewTopView = NewTopView;
 	TopView.ptr.prototype.OnClickStart = function(event$1) {
-		var _r, c, event$1, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; event$1 = $f.event$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		var _r, _r$1, c, event$1, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; c = $f.c; event$1 = $f.event$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		c = [c];
 		c[0] = this;
 		_r = $clone(console, js.Value).Call("log", new sliceType([new $String("start")])); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_r;
+		_r$1 = $clone($clone(window, js.Value).Get("noSleep"), js.Value).Call("enable", new sliceType([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_r$1;
 		$go((function(c) { return function $b() {
-			var _r$1, _r$10, _r$11, _r$12, _r$13, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, ch, device, err, err$1, err$2, fail, success, success2, $s, $deferred, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$1 = $f._r$1; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; ch = $f.ch; device = $f.device; err = $f.err; err$1 = $f.err$1; err$2 = $f.err$2; fail = $f.fail; success = $f.success; success2 = $f.success2; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+			var _r$10, _r$11, _r$12, _r$13, _r$14, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, ch, device, err, err$1, err$2, fail, success, success2, $s, $deferred, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$10 = $f._r$10; _r$11 = $f._r$11; _r$12 = $f._r$12; _r$13 = $f._r$13; _r$14 = $f._r$14; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; ch = $f.ch; device = $f.device; err = $f.err; err$1 = $f.err$1; err$2 = $f.err$2; fail = $f.fail; success = $f.success; success2 = $f.success2; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
 			ch = [ch];
 			device = [device];
 			c[0].RawSize = 0;
@@ -30851,43 +30853,43 @@ $packages["hrm-logger/frontend"] = (function() {
 				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.args = args; $f.this$1 = this$1; $f.$s = $s; $f.$r = $r; return $f;
 			}; })(c, ch, device)), js.Func);
 			$deferred.push([$methodVal($clone(success2, js.Func), "Release"), []]);
-			_r$1 = $clone(c[0].recorder.Value, js.Value).Call("getDevice", new sliceType([])); /* */ $s = 1; case 1: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			_r$2 = $clone(_r$1, js.Value).Call("then", new sliceType([new success2.constructor.elem(success2), new fail.constructor.elem(fail)])); /* */ $s = 2; case 2: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			_r$2;
-			_r$3 = $recv(ch[0]); /* */ $s = 3; case 3: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-			err = $clone(_r$3[0], js.Value);
+			_r$2 = $clone(c[0].recorder.Value, js.Value).Call("getDevice", new sliceType([])); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			_r$3 = $clone(_r$2, js.Value).Call("then", new sliceType([new success2.constructor.elem(success2), new fail.constructor.elem(fail)])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			_r$3;
+			_r$4 = $recv(ch[0]); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+			err = $clone(_r$4[0], js.Value);
 			/* */ if (!($equal(err, js.Null(), js.Value))) { $s = 4; continue; }
 			/* */ $s = 5; continue;
 			/* if (!($equal(err, js.Null(), js.Value))) { */ case 4:
-				_r$4 = $clone(window, js.Value).Call("alert", new sliceType([new err.constructor.elem(err)])); /* */ $s = 6; case 6: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-				_r$4;
+				_r$5 = $clone(window, js.Value).Call("alert", new sliceType([new err.constructor.elem(err)])); /* */ $s = 6; case 6: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+				_r$5;
 				$s = -1; return;
 			/* } */ case 5:
-			_r$5 = $clone(console, js.Value).Call("log", new sliceType([new device[0].constructor.elem(device[0])])); /* */ $s = 7; case 7: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-			_r$5;
-			_r$6 = $clone(c[0].recorder.Value, js.Value).Call("connect", new sliceType([new device[0].constructor.elem(device[0])])); /* */ $s = 8; case 8: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-			_r$7 = $clone(_r$6, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 9; case 9: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-			_r$7;
-			_r$8 = $recv(ch[0]); /* */ $s = 10; case 10: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-			err$1 = $clone(_r$8[0], js.Value);
+			_r$6 = $clone(console, js.Value).Call("log", new sliceType([new device[0].constructor.elem(device[0])])); /* */ $s = 7; case 7: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+			_r$6;
+			_r$7 = $clone(c[0].recorder.Value, js.Value).Call("connect", new sliceType([new device[0].constructor.elem(device[0])])); /* */ $s = 8; case 8: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+			_r$8 = $clone(_r$7, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 9; case 9: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+			_r$8;
+			_r$9 = $recv(ch[0]); /* */ $s = 10; case 10: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+			err$1 = $clone(_r$9[0], js.Value);
 			/* */ if (!($equal(err$1, js.Null(), js.Value))) { $s = 11; continue; }
 			/* */ $s = 12; continue;
 			/* if (!($equal(err$1, js.Null(), js.Value))) { */ case 11:
-				_r$9 = $clone(window, js.Value).Call("alert", new sliceType([new err$1.constructor.elem(err$1)])); /* */ $s = 13; case 13: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
-				_r$9;
+				_r$10 = $clone(window, js.Value).Call("alert", new sliceType([new err$1.constructor.elem(err$1)])); /* */ $s = 13; case 13: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
+				_r$10;
 				$s = -1; return;
 			/* } */ case 12:
 			c[0].Connected = true;
-			_r$10 = $clone(c[0].recorder.Value, js.Value).Call("start", new sliceType([])); /* */ $s = 14; case 14: if($c) { $c = false; _r$10 = _r$10.$blk(); } if (_r$10 && _r$10.$blk !== undefined) { break s; }
-			_r$11 = $clone(_r$10, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 15; case 15: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
-			_r$11;
-			_r$12 = $recv(ch[0]); /* */ $s = 16; case 16: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
-			err$2 = $clone(_r$12[0], js.Value);
+			_r$11 = $clone(c[0].recorder.Value, js.Value).Call("start", new sliceType([])); /* */ $s = 14; case 14: if($c) { $c = false; _r$11 = _r$11.$blk(); } if (_r$11 && _r$11.$blk !== undefined) { break s; }
+			_r$12 = $clone(_r$11, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 15; case 15: if($c) { $c = false; _r$12 = _r$12.$blk(); } if (_r$12 && _r$12.$blk !== undefined) { break s; }
+			_r$12;
+			_r$13 = $recv(ch[0]); /* */ $s = 16; case 16: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
+			err$2 = $clone(_r$13[0], js.Value);
 			/* */ if (!($equal(err$2, js.Null(), js.Value))) { $s = 17; continue; }
 			/* */ $s = 18; continue;
 			/* if (!($equal(err$2, js.Null(), js.Value))) { */ case 17:
-				_r$13 = $clone(window, js.Value).Call("alert", new sliceType([new err$2.constructor.elem(err$2)])); /* */ $s = 19; case 19: if($c) { $c = false; _r$13 = _r$13.$blk(); } if (_r$13 && _r$13.$blk !== undefined) { break s; }
-				_r$13;
+				_r$14 = $clone(window, js.Value).Call("alert", new sliceType([new err$2.constructor.elem(err$2)])); /* */ $s = 19; case 19: if($c) { $c = false; _r$14 = _r$14.$blk(); } if (_r$14 && _r$14.$blk !== undefined) { break s; }
+				_r$14;
 				$s = -1; return;
 			/* } */ case 18:
 			c[0].Stopped = false;
@@ -30895,22 +30897,24 @@ $packages["hrm-logger/frontend"] = (function() {
 			c[0].FirmwareRevision = c[0].recorder.GetVersion();
 			$r = vecty.Rerender(c[0]); /* */ $s = 21; case 21: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = -1; return;
-			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$1 = _r$1; $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f.ch = ch; $f.device = device; $f.err = err; $f.err$1 = err$1; $f.err$2 = err$2; $f.fail = fail; $f.success = success; $f.success2 = success2; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$10 = _r$10; $f._r$11 = _r$11; $f._r$12 = _r$12; $f._r$13 = _r$13; $f._r$14 = _r$14; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f.ch = ch; $f.device = device; $f.err = err; $f.err$1 = err$1; $f.err$2 = err$2; $f.fail = fail; $f.success = success; $f.success2 = success2; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 		}; })(c), []);
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: TopView.ptr.prototype.OnClickStart }; } $f._r = _r; $f.c = c; $f.event$1 = event$1; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: TopView.ptr.prototype.OnClickStart }; } $f._r = _r; $f._r$1 = _r$1; $f.c = c; $f.event$1 = event$1; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	TopView.prototype.OnClickStart = function(event$1) { return this.$val.OnClickStart(event$1); };
 	TopView.ptr.prototype.OnClickStop = function(event$1) {
-		var _r, c, event$1, $s, $r;
-		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; c = $f.c; event$1 = $f.event$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
+		var _r, _r$1, c, event$1, $s, $r;
+		/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r = $f._r; _r$1 = $f._r$1; c = $f.c; event$1 = $f.event$1; $s = $f.$s; $r = $f.$r; } s: while (true) { switch ($s) { case 0:
 		c = [c];
 		c[0] = this;
 		_r = $clone(console, js.Value).Call("log", new sliceType([new $String("stop")])); /* */ $s = 1; case 1: if($c) { $c = false; _r = _r.$blk(); } if (_r && _r.$blk !== undefined) { break s; }
 		_r;
+		_r$1 = $clone($clone(window, js.Value).Get("noSleep"), js.Value).Call("disable", new sliceType([])); /* */ $s = 2; case 2: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
+		_r$1;
 		$go((function(c) { return function $b() {
-			var _r$1, _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, ch, err, err$1, fail, success, $s, $deferred, $r;
-			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$1 = $f._r$1; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; ch = $f.ch; err = $f.err; err$1 = $f.err$1; fail = $f.fail; success = $f.success; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
+			var _r$2, _r$3, _r$4, _r$5, _r$6, _r$7, _r$8, _r$9, ch, err, err$1, fail, success, $s, $deferred, $r;
+			/* */ $s = 0; var $f, $c = false; if (this !== undefined && this.$blk !== undefined) { $f = this; $c = true; _r$2 = $f._r$2; _r$3 = $f._r$3; _r$4 = $f._r$4; _r$5 = $f._r$5; _r$6 = $f._r$6; _r$7 = $f._r$7; _r$8 = $f._r$8; _r$9 = $f._r$9; ch = $f.ch; err = $f.err; err$1 = $f.err$1; fail = $f.fail; success = $f.success; $s = $f.$s; $deferred = $f.$deferred; $r = $f.$r; } var $err = null; try { s: while (true) { switch ($s) { case 0: $deferred = []; $deferred.index = $curGoroutine.deferStack.length; $curGoroutine.deferStack.push($deferred);
 			ch = [ch];
 			ch[0] = new $Chan(js.Value, 0);
 			success = $clone(js.FuncOf((function(c, ch) { return function $b(this$1, args) {
@@ -30929,38 +30933,38 @@ $packages["hrm-logger/frontend"] = (function() {
 				/* */ } return; } if ($f === undefined) { $f = { $blk: $b }; } $f.args = args; $f.this$1 = this$1; $f.$s = $s; $f.$r = $r; return $f;
 			}; })(c, ch)), js.Func);
 			$deferred.push([$methodVal($clone(fail, js.Func), "Release"), []]);
-			_r$1 = $clone(c[0].recorder.Value, js.Value).Call("disconnect", new sliceType([])); /* */ $s = 1; case 1: if($c) { $c = false; _r$1 = _r$1.$blk(); } if (_r$1 && _r$1.$blk !== undefined) { break s; }
-			_r$2 = $clone(_r$1, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 2; case 2: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
-			_r$2;
-			_r$3 = $recv(ch[0]); /* */ $s = 3; case 3: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
-			err = $clone(_r$3[0], js.Value);
+			_r$2 = $clone(c[0].recorder.Value, js.Value).Call("disconnect", new sliceType([])); /* */ $s = 1; case 1: if($c) { $c = false; _r$2 = _r$2.$blk(); } if (_r$2 && _r$2.$blk !== undefined) { break s; }
+			_r$3 = $clone(_r$2, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 2; case 2: if($c) { $c = false; _r$3 = _r$3.$blk(); } if (_r$3 && _r$3.$blk !== undefined) { break s; }
+			_r$3;
+			_r$4 = $recv(ch[0]); /* */ $s = 3; case 3: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
+			err = $clone(_r$4[0], js.Value);
 			/* */ if (!($equal(err, js.Null(), js.Value))) { $s = 4; continue; }
 			/* */ $s = 5; continue;
 			/* if (!($equal(err, js.Null(), js.Value))) { */ case 4:
-				_r$4 = $clone(window, js.Value).Call("alert", new sliceType([new err.constructor.elem(err)])); /* */ $s = 6; case 6: if($c) { $c = false; _r$4 = _r$4.$blk(); } if (_r$4 && _r$4.$blk !== undefined) { break s; }
-				_r$4;
+				_r$5 = $clone(window, js.Value).Call("alert", new sliceType([new err.constructor.elem(err)])); /* */ $s = 6; case 6: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
+				_r$5;
 				$s = -1; return;
 			/* } */ case 5:
 			c[0].Connected = false;
-			_r$5 = $clone(c[0].recorder.Value, js.Value).Call("stop", new sliceType([])); /* */ $s = 7; case 7: if($c) { $c = false; _r$5 = _r$5.$blk(); } if (_r$5 && _r$5.$blk !== undefined) { break s; }
-			_r$6 = $clone(_r$5, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 8; case 8: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
-			_r$6;
-			_r$7 = $recv(ch[0]); /* */ $s = 9; case 9: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
-			err$1 = $clone(_r$7[0], js.Value);
+			_r$6 = $clone(c[0].recorder.Value, js.Value).Call("stop", new sliceType([])); /* */ $s = 7; case 7: if($c) { $c = false; _r$6 = _r$6.$blk(); } if (_r$6 && _r$6.$blk !== undefined) { break s; }
+			_r$7 = $clone(_r$6, js.Value).Call("then", new sliceType([new success.constructor.elem(success), new fail.constructor.elem(fail)])); /* */ $s = 8; case 8: if($c) { $c = false; _r$7 = _r$7.$blk(); } if (_r$7 && _r$7.$blk !== undefined) { break s; }
+			_r$7;
+			_r$8 = $recv(ch[0]); /* */ $s = 9; case 9: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
+			err$1 = $clone(_r$8[0], js.Value);
 			/* */ if (!($equal(err$1, js.Null(), js.Value))) { $s = 10; continue; }
 			/* */ $s = 11; continue;
 			/* if (!($equal(err$1, js.Null(), js.Value))) { */ case 10:
-				_r$8 = $clone(window, js.Value).Call("alert", new sliceType([new err$1.constructor.elem(err$1)])); /* */ $s = 12; case 12: if($c) { $c = false; _r$8 = _r$8.$blk(); } if (_r$8 && _r$8.$blk !== undefined) { break s; }
-				_r$8;
+				_r$9 = $clone(window, js.Value).Call("alert", new sliceType([new err$1.constructor.elem(err$1)])); /* */ $s = 12; case 12: if($c) { $c = false; _r$9 = _r$9.$blk(); } if (_r$9 && _r$9.$blk !== undefined) { break s; }
+				_r$9;
 				$s = -1; return;
 			/* } */ case 11:
 			c[0].Stopped = true;
 			$r = vecty.Rerender(c[0]); /* */ $s = 13; case 13: if($c) { $c = false; $r = $r.$blk(); } if ($r && $r.$blk !== undefined) { break s; }
 			$s = -1; return;
-			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$1 = _r$1; $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f.ch = ch; $f.err = err; $f.err$1 = err$1; $f.fail = fail; $f.success = success; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
+			/* */ } return; } } catch(err) { $err = err; $s = -1; } finally { $callDeferred($deferred, $err); if($curGoroutine.asleep) { if ($f === undefined) { $f = { $blk: $b }; } $f._r$2 = _r$2; $f._r$3 = _r$3; $f._r$4 = _r$4; $f._r$5 = _r$5; $f._r$6 = _r$6; $f._r$7 = _r$7; $f._r$8 = _r$8; $f._r$9 = _r$9; $f.ch = ch; $f.err = err; $f.err$1 = err$1; $f.fail = fail; $f.success = success; $f.$s = $s; $f.$deferred = $deferred; $f.$r = $r; return $f; } }
 		}; })(c), []);
 		$s = -1; return;
-		/* */ } return; } if ($f === undefined) { $f = { $blk: TopView.ptr.prototype.OnClickStop }; } $f._r = _r; $f.c = c; $f.event$1 = event$1; $f.$s = $s; $f.$r = $r; return $f;
+		/* */ } return; } if ($f === undefined) { $f = { $blk: TopView.ptr.prototype.OnClickStop }; } $f._r = _r; $f._r$1 = _r$1; $f.c = c; $f.event$1 = event$1; $f.$s = $s; $f.$r = $r; return $f;
 	};
 	TopView.prototype.OnClickStop = function(event$1) { return this.$val.OnClickStop(event$1); };
 	TopView.ptr.prototype.Event = function(this$1, args) {
