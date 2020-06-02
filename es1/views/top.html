@@ -1,0 +1,66 @@
+<body>
+  <header class="navbar">
+    <section>
+      <a href="#/" class="navbar-brand">HS-BAND(ES1) Utility</a>
+    </section>
+  </header>
+  <main class="container">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label class="form-label">Device</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <button
+              type="button"
+              class="btn input-group-btn"
+              @click="{{c.OnConnect}}"
+            >
+              Connect
+            </button>
+            <button
+              type="button"
+              class="btn input-group-btn"
+              @click="{{c.OnDisconnect}}"
+            >
+              Disconnect
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+    <form class="form-horizontal" @submit="{{c.OnSetLED}}">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label for="color" class="form-label">Set LED Color</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <input
+              type="color"
+              name="color"
+              class="form-input"
+              style="max-width: 400px;"
+            />
+            <button class="btn input-group-btn">
+              SEND
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+    <form class="form-horizontal" @submit="{{c.OnEnterOTA}}">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label for="enterOTA" class="form-label">Enter OTA Mode</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <button class="btn input-group-btn">Enter</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+</body>
