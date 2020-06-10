@@ -235,6 +235,15 @@ class HrmRecorder {
         await this.postEnv(value);
       }
     );
+    try {
+      var posix = Math.floor(new Date().getTime() / 1000);
+      var b = new Uint8Array([0xfb, 0, 0, 0, 0]);
+      var dv = new DataView(b.buffer);
+      dv.setUint32(1, posix, true); // set littleEndian
+      await this.write.writeValue(b);
+    } catch (x) {
+      console.log("catch:", x);
+    }
     await this.write.writeValue(new Uint8Array([0xfd])); // ENTER_RAW_MODE
     await this.rawNotify.startNotifications();
     await this.rriNotify.startNotifications();
