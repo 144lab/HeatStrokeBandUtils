@@ -29,6 +29,7 @@ clean:
 
 dist:
 	mkdir -p $(DIST)
+	$(GO) generate ./...
 	GOOS=js GOARCH=wasm $(GO) build -o $(DIST)/main.wasm .
 	cp -f $(shell $(GO) env GOROOT)/misc/wasm/wasm_exec.js $(DIST)/
 	cp -Rf assets $(DIST)/

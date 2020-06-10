@@ -17,7 +17,15 @@ func (c *Top) Render() wecty.HTML {
 					wecty.Class{
 						"navbar-brand": true,
 					},
-					wecty.Text("HS-BAND(ES1) Utility"),
+					wecty.Text("HS-BAND Utility(for ES1)"),
+				),
+				wecty.Tag("a", 					
+					wecty.Attr("href", "../all/dist/index.html#/"),
+					wecty.Class{
+						"btn": true,
+						"btn-link": true,
+					},
+					wecty.Text("Recorder"),
 				),
 			),
 		),
