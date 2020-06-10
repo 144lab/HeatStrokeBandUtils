@@ -141,6 +141,16 @@ func (c *Top) OnShutdown(ev js.Value) interface{} {
 	return nil
 }
 
+// OnFactoryReset ...
+func (c *Top) OnFactoryReset(ev js.Value) interface{} {
+	ev.Call("preventDefault")
+	if js.Global().Call("confirm", "Do you want to initialize the connected device?").Bool() {
+		log.Println("FactoryReset")
+		c.recorder.Call("writeValue", bytesToJS([]byte{0xff}))
+	}
+	return nil
+}
+
 // OnEnterOTA ...
 func (c *Top) OnEnterOTA(ev js.Value) interface{} {
 	ev.Call("preventDefault")

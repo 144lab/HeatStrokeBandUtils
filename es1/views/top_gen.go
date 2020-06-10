@@ -188,6 +188,49 @@ func (c *Top) Render() wecty.HTML {
 				wecty.Class{
 					"form-horizontal": true,
 				},
+				wecty.Event("submit", c.OnFactoryReset),
+				wecty.Tag("div", 					
+					wecty.Class{
+						"form-group": true,
+					},
+					wecty.Tag("div", 						
+						wecty.Class{
+							"col-2": true,
+							"col-sm-12": true,
+						},
+						wecty.Tag("label", 							
+							wecty.Attr("for", "enterOTA"),
+							wecty.Class{
+								"form-label": true,
+							},
+							wecty.Text("Factory Reset"),
+						),
+					),
+					wecty.Tag("div", 						
+						wecty.Class{
+							"col-10": true,
+							"col-sm-12": true,
+						},
+						wecty.Tag("div", 							
+							wecty.Class{
+								"input-group": true,
+							},
+							wecty.Tag("button", 								
+								wecty.Class{
+									"btn": true,
+									"input-group-btn": true,
+									"disabled": true,
+								},
+								wecty.Text("Reset"),
+							),
+						),
+					),
+				),
+			),
+			wecty.Tag("form", 				
+				wecty.Class{
+					"form-horizontal": true,
+				},
 				wecty.Event("submit", c.OnEnterOTA),
 				wecty.Tag("div", 					
 					wecty.Class{
