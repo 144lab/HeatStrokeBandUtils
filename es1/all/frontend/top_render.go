@@ -30,7 +30,7 @@ func (c *TopView) Render() vecty.ComponentOrHTML {
 				),
 				elem.Anchor(
 					vecty.Markup(
-						prop.Href("../../dist/index.html"),
+						prop.Href("../../dist/#/"),
 						vecty.ClassMap{
 							"btn":      true,
 							"btn-link": true,

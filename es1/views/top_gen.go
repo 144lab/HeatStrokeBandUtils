@@ -20,7 +20,7 @@ func (c *Top) Render() wecty.HTML {
 					wecty.Text("HS-BAND Utility(for ES1)"),
 				),
 				wecty.Tag("a", 					
-					wecty.Attr("href", "../all/dist/index.html#/"),
+					wecty.Attr("href", "../all/dist/#/"),
 					wecty.Class{
 						"btn": true,
 						"btn-link": true,
