@@ -8,7 +8,9 @@
     <form class="form-horizontal">
       <div class="form-group">
         <div class="col-2 col-sm-12">
-          <label class="form-label">Device</label>
+          <label class="form-label"
+            >Device(<span>{{wecty.Text(c.FirmwareRevision)}}</span>)</label
+          >
         </div>
         <div class="col-10 col-sm-12">
           <div class="input-group">
@@ -21,7 +23,7 @@
             </button>
             <button
               type="button"
-              class="btn input-group-btn"
+              class="btn input-group-btn disabled"
               @click="{{c.OnDisconnect}}"
             >
               Disconnect
@@ -43,9 +45,21 @@
               class="form-input"
               style="max-width: 400px;"
             />
-            <button class="btn input-group-btn">
+            <button class="btn input-group-btn disabled">
               SEND
             </button>
+          </div>
+        </div>
+      </div>
+    </form>
+    <form class="form-horizontal" @submit="{{c.OnShutdown}}">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label for="enterOTA" class="form-label">Enter Shutdown Mode</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <button class="btn input-group-btn disabled">Enter</button>
           </div>
         </div>
       </div>
@@ -57,7 +71,7 @@
         </div>
         <div class="col-10 col-sm-12">
           <div class="input-group">
-            <button class="btn input-group-btn">Enter</button>
+            <button class="btn input-group-btn disabled">Enter</button>
           </div>
         </div>
       </div>

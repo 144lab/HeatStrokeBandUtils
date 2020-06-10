@@ -73,6 +73,12 @@ func (c *Top) OnConnect(ev js.Value) interface{} {
 		log.Println(c.Connected, c.Stopped)
 		c.FirmwareRevision = c.recorder.GetVersion()
 		wecty.Rerender(c)
+		fn := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			args[0].Get("classList").Call("remove", "disabled")
+			return nil
+		})
+		js.Global().Get("document").Call("querySelectorAll", ".disabled").Call("forEach", fn)
+		fn.Release()
 	}()
 	return nil
 }
@@ -124,6 +130,14 @@ func (c *Top) OnSetLED(ev js.Value) interface{} {
 	}
 	log.Println("set led color:", b)
 	c.recorder.Call("writeValue", bytesToJS(append([]byte{0xfa, 0x01}, b...)))
+	return nil
+}
+
+// OnShutdown ...
+func (c *Top) OnShutdown(ev js.Value) interface{} {
+	ev.Call("preventDefault")
+	log.Println("Shutdown")
+	c.recorder.Call("writeValue", bytesToJS([]byte{0xf9}))
 	return nil
 }
 

@@ -1,6 +1,6 @@
-
-GO=go
-DIST=dist
+SRCDIR := $(shell pwd)
+DSTDIR := dist
+GO := go
 
 export index_html
 override define index_html
@@ -22,14 +22,16 @@ override define index_html
 </script>
 endef
 
-all: clean dist
+run: clean
+	wecty server
 
 clean:
-	@-rm -rf $(DIST)
+	$(foreach f,wasm_exec.js main.wasm index.html,$(shell if [ -e $f ]; then rm $f; fi))
 
-dist:
-	mkdir -p $(DIST)
-	GOOS=js GOARCH=wasm $(GO) build -o $(DIST)/main.wasm .
-	cp -f $(shell $(GO) env GOROOT)/misc/wasm/wasm_exec.js $(DIST)/
-	cp -Rf assets $(DIST)/
-	echo "$$index_html" > $(DIST)/index.html
+deploy:
+	@echo "deploy: $(SRCDIR) -> $(DSTDIR)"
+	mkdir -p $(DSTDIR)
+	GO111MODULE=on GOOS=js GOARCH=wasm $(GO) build -o $(DSTDIR)/main.wasm .
+	echo "$$index_html" > $(DSTDIR)/index.html
+	cp $(shell $(GO) env GOROOT)/misc/wasm/wasm_exec.js $(DSTDIR)/wasm_exec.js
+	cp -Rf assets $(DSTDIR)/

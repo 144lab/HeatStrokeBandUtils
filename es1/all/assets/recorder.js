@@ -1,7 +1,5 @@
 const serviceUUID = "30c4d481-ea34-457b-8d54-5efc625241f7";
 const writeUUID = "e9062e71-9e62-4bc6-b0d3-35cdcd9b027b";
-const recordStatusUUID = "30c4d483-ea34-457b-8d54-5efc625241f7";
-const recordNotifyUUID = "30c4d484-ea34-457b-8d54-5efc625241f7";
 const rawNotifyUUID = "5008e0bd-3581-4d4c-a6d8-c257a369e189";
 const rriNotifyUUID = "b84ea3e8-b237-4b95-a394-6911180b7638";
 const envNotifyUUID = "62fbd229-6edd-4d1a-b554-5c4e1bb29169";
@@ -187,7 +185,7 @@ class HrmRecorder {
     if (this.device == null) {
       throw Error("no device");
     }
-    console.log("connect: ", this.device.id);
+    console.log(this.device.id);
     this.device.addEventListener("gattserverdisconnected", (event) => {
       if (this.errCount > 100) {
         this.dispatcher("disconnected");
@@ -237,16 +235,7 @@ class HrmRecorder {
         await this.postEnv(value);
       }
     );
-    try {
-      var posix = Math.floor(new Date().getTime() / 1000);
-      var b = new Uint8Array([0xfb, 0, 0, 0, 0]);
-      var dv = new DataView(b.buffer);
-      dv.setUint32(1, posix, true); // set littleEndian
-      await this.write.writeValue(b);
-    } catch (x) {
-      console.log("catch:", x);
-    }
-    //await this.write.writeValue(new Uint8Array([0xfd])); // ENTER_RAW_MODE
+    await this.write.writeValue(new Uint8Array([0xfd])); // ENTER_RAW_MODE
     await this.rawNotify.startNotifications();
     await this.rriNotify.startNotifications();
     await this.envNotify.startNotifications();
@@ -257,18 +246,10 @@ class HrmRecorder {
   }
 
   async disconnect() {
-    console.log("disconnect: ", this.device);
     if (this.device) {
-      console.log("disconnect: ", this.device.id);
       var device = this.device;
       this.device = null;
       await device.gatt.disconnect();
-    }
-  }
-
-  async writeValue(b) {
-    if (this.server.connected) {
-      await this.write.writeValue(b);
     }
   }
 
@@ -333,7 +314,10 @@ class HrmRecorder {
   async postRri(s) {
     const data = new DataView(s);
     const tm = data.getUint32(0, true);
-    const rri = data.getUint16(4, true);
+    var rri = [];
+    for (var i = 0; i < 8; i++) {
+      rri.push(data.getUint16(4, true));
+    }
     const led = data.getUint8(6);
     const seq = data.getUint8(7);
     if (this.rriFile != null) {
@@ -342,7 +326,7 @@ class HrmRecorder {
         file,
         new Blob(
           [
-            [String(tm), String(rri), String(led), String(seq)].join(",") +
+            [String(tm), rri.join(","), String(led), String(seq)].join(",") +
               "\n",
           ],
           {
@@ -360,10 +344,10 @@ class HrmRecorder {
   async postEnv(s) {
     const data = new DataView(s);
     const tm = data.getUint32(0, true);
-    const humidity = data.getInt16(4, true) / 100;
-    const airTemp = data.getInt16(6, true) / 100;
-    const skinTemp = data.getInt16(8, true) / 100;
-    const estTemp = data.getInt16(10, true) / 100;
+    const humidity = data.getUint16(4, true) / 100;
+    const airTemp = data.getUint16(6, true) / 100;
+    const skinTemp = data.getUint16(8, true) / 100;
+    const estTemp = data.getUint16(10, true) / 100;
     const battery = data.getUint8(12);
     const flags = data.getUint8(13);
     if (this.envFile != null) {

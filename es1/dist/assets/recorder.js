@@ -246,7 +246,7 @@ class HrmRecorder {
     } catch (x) {
       console.log("catch:", x);
     }
-    await this.write.writeValue(new Uint8Array([0xfd])); // ENTER_RAW_MODE
+    //await this.write.writeValue(new Uint8Array([0xfd])); // ENTER_RAW_MODE
     await this.rawNotify.startNotifications();
     await this.rriNotify.startNotifications();
     await this.envNotify.startNotifications();
