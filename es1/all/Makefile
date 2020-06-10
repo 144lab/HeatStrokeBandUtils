@@ -22,13 +22,18 @@ override define index_html
 </script>
 endef
 
+.PHONY: all clean run dist
+
+all: clean dist
+
 run: clean
 	wecty server
 
 clean:
 	$(foreach f,wasm_exec.js main.wasm index.html,$(shell if [ -e $f ]; then rm $f; fi))
+	@- rm -rf $(DSTDIR)
 
-deploy:
+dist:
 	@echo "deploy: $(SRCDIR) -> $(DSTDIR)"
 	mkdir -p $(DSTDIR)
 	GO111MODULE=on GOOS=js GOARCH=wasm $(GO) build -o $(DSTDIR)/main.wasm .
