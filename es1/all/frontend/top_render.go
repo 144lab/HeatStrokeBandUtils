@@ -23,20 +23,20 @@ func (c *TopView) Render() vecty.ComponentOrHTML {
 				),
 				elem.Anchor(
 					vecty.Markup(
-						prop.Href("/HeatStrokeBandUtils/all/#/"),
+						prop.Href("#/"),
 						vecty.Class("navbar-brand"),
 					),
-					vecty.Text("Heatstroke Band Utility(All Recording)"),
+					vecty.Text("HS-Band Recorder(for ES1)"),
 				),
 				elem.Anchor(
 					vecty.Markup(
-						prop.Href("/HeatStrokeBandUtils/#/"),
+						prop.Href("../../dist/index.html"),
 						vecty.ClassMap{
 							"btn":      true,
 							"btn-link": true,
 						},
 					),
-					vecty.Text("Normal Mode"),
+					vecty.Text("Utility"),
 				),
 			),
 		),
