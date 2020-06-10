@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"syscall/js"
+	"time"
 
 	"github.com/nobonobo/wecty"
 )
@@ -59,6 +60,7 @@ func (c *Top) OnConnect(ev js.Value) interface{} {
 		c.recorder.Call("connect", device).Call("then", success, fail)
 		if err := <-ch; !err.IsNull() {
 			js.Global().Call("alert", err)
+			c.OnDisconnect(ev)
 			return
 		}
 		c.Connected = true
@@ -138,6 +140,7 @@ func (c *Top) OnShutdown(ev js.Value) interface{} {
 	ev.Call("preventDefault")
 	log.Println("Shutdown")
 	c.recorder.Call("writeValue", bytesToJS([]byte{0xf9}))
+	time.AfterFunc(500*time.Millisecond, func() { c.OnDisconnect(ev) })
 	return nil
 }
 
@@ -147,6 +150,7 @@ func (c *Top) OnFactoryReset(ev js.Value) interface{} {
 	if js.Global().Call("confirm", "Do you want to initialize the connected device?").Bool() {
 		log.Println("FactoryReset")
 		c.recorder.Call("writeValue", bytesToJS([]byte{0xff}))
+		time.AfterFunc(500*time.Millisecond, func() { c.OnDisconnect(ev) })
 	}
 	return nil
 }
@@ -156,7 +160,7 @@ func (c *Top) OnEnterOTA(ev js.Value) interface{} {
 	ev.Call("preventDefault")
 	log.Println("EnterOTA")
 	c.recorder.Call("writeValue", bytesToJS([]byte{0xfe}))
-	c.OnDisconnect(ev)
+	time.AfterFunc(500*time.Millisecond, func() { c.OnDisconnect(ev) })
 	return nil
 }
 
