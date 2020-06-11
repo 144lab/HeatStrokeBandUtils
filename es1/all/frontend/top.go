@@ -11,17 +11,12 @@ import (
 // TopView ...
 type TopView struct {
 	wecty.Core
-	recorder         *Recorder
-	noSleep          js.Value
-	FirmwareRevision string
-	LastRri          Rri
-	LastEnv          Env
-	Connected        bool
-	Stopped          bool
-	RawSize          int
-	RriSize          int
-	EnvSize          int
-	FileList         *FileList
+	recorder  *Recorder
+	noSleep   js.Value
+	inform    *Inform
+	Connected bool
+	Stopped   bool
+	FileList  *FileList
 }
 
 // NewTopView ...
@@ -29,6 +24,7 @@ func NewTopView() *TopView {
 	top := &TopView{}
 	top.recorder = NewRecorder(js.FuncOf(top.Event))
 	top.noSleep = window.Get("NoSleep").New()
+	top.inform = &Inform{}
 	top.FileList = &FileList{
 		updater:  top,
 		recorder: top.recorder,
@@ -42,9 +38,9 @@ func (c *TopView) OnClickStart(ev js.Value) interface{} {
 	ev.Call("preventDefault")
 	c.noSleep.Call("enable")
 	go func() {
-		c.RawSize = 0
-		c.RriSize = 0
-		c.EnvSize = 0
+		c.inform.RawSize = 0
+		c.inform.RriSize = 0
+		c.inform.EnvSize = 0
 		ch := make(chan js.Value, 1)
 		success := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			ch <- js.Null()
@@ -85,7 +81,7 @@ func (c *TopView) OnClickStart(ev js.Value) interface{} {
 		}
 		c.Stopped = false
 		log.Println(c.Connected, c.Stopped)
-		c.FirmwareRevision = c.recorder.GetVersion()
+		c.inform.FirmwareRevision = c.recorder.GetVersion()
 		wecty.Rerender(c)
 	}()
 	return nil
@@ -151,18 +147,18 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 	case "record":
 		switch args[1].String() {
 		case "waveform.bin":
-			c.RawSize += 80
-			wecty.Rerender(c)
+			c.inform.RawSize += 80
+			wecty.Rerender(c.inform)
 		case "rri.csv":
-			c.RriSize += args[2].Get("Rri").Length()
-			c.LastRri = Rri{
+			c.inform.RriSize += args[2].Get("Rri").Length()
+			c.inform.LastRri = Rri{
 				Timestamp: uint32(args[2].Get("Timestamp").Int()),
 				Rri:       uint16(args[2].Get("Rri").Index(7).Int()),
 			}
-			wecty.Rerender(c)
+			wecty.Rerender(c.inform)
 		case "environment.csv":
-			c.EnvSize++
-			c.LastEnv = Env{
+			c.inform.EnvSize++
+			c.inform.LastEnv = Env{
 				Timestamp:       uint32(args[2].Get("Timestamp").Int()),
 				Humidity:        args[2].Get("Humidity").Float(),
 				Temperature:     args[2].Get("Temperature").Float(),
@@ -170,7 +166,7 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 				EstTemperature:  args[2].Get("EstTemperature").Float(),
 				BatteryLevel:    uint8(args[2].Get("BatteryLevel").Int()),
 			}
-			wecty.Rerender(c)
+			wecty.Rerender(c.inform)
 		default:
 			console.Call("log", "unknown file", args[1])
 		}
