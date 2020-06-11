@@ -1,5 +1,5 @@
 
-GO=go
+GO := go1.12.17
 DIST=dist
 
 export index_html

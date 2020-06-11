@@ -1,0 +1,266 @@
+<body>
+  <header class="navbar">
+    <section class="navbar-section">
+      <a href="#/" class="navbar-brand">HS-Band Recorder(for ES1)</a
+      ><a href="../../dist/#/" class="btn btn-link">Utility</a>
+    </section>
+  </header>
+  <main class="container">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label for="start" class="form-label">Collect</label>
+        </div>
+        <div class="col-sm-12 col-10">
+          <div class="input-group">
+            <button class="btn-primary input-group-btn btn">START</button
+            ><button class="disabled btn input-group-btn">STOP</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label for="count" class="form-label">Waveform Recorded</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="input-group">
+            <span class="input-group-addon">count:</span
+            ><input
+              type="number"
+              id="rawCount"
+              readonly=""
+              class="form-input"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label for="count" class="form-label">RRI Recorded</label>
+        </div>
+        <div class="col-sm-12 col-10">
+          <div class="input-group">
+            <span class="input-group-addon">count:</span
+            ><input
+              type="number"
+              id="rriCount"
+              readonly=""
+              class="form-input"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label for="count" class="form-label">Environment Recorded</label>
+        </div>
+        <div class="col-sm-12 col-10">
+          <div class="input-group">
+            <span class="input-group-addon">count:</span
+            ><input
+              type="number"
+              id="envCount"
+              readonly=""
+              class="form-input"
+            />
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label class="form-label">Firmware Revision</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <input
+            type="text"
+            placeholder="unknown"
+            readonly="true"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-12 col-2"><label class="form-label">RRI</label></div>
+        <div class="col-10 col-sm-12">
+          <input
+            type="text"
+            placeholder="RRI"
+            readonly="true"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label class="form-label">Environment</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="columns">
+            <div class="col-6 col-sm-12 column">
+              <div class="input-group">
+                <span class="input-group-addon">Humidity</span
+                ><input type="text" readonly="" class="form-input" />
+              </div>
+            </div>
+            <div class="col-sm-12 column col-6">
+              <div class="input-group">
+                <span class="input-group-addon">Temperature</span
+                ><input type="text" readonly="" class="form-input" />
+              </div>
+            </div>
+            <div class="column col-6 col-sm-12">
+              <div class="input-group">
+                <span class="input-group-addon">Skin Temperature</span
+                ><input type="text" readonly="" class="form-input" />
+              </div>
+            </div>
+            <div class="col-sm-12 column col-6">
+              <div class="input-group">
+                <span class="input-group-addon">Est Temperature</span
+                ><input type="text" readonly="" class="form-input" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-12 col-2">
+          <label class="form-label">Battery Level</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <input
+            type="text"
+            placeholder="Battery Level"
+            readonly="true"
+            class="form-input"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <div class="col-2 col-sm-12">
+          <label class="form-label">Download Files</label>
+        </div>
+        <div class="col-10 col-sm-12">
+          <div class="columns">
+            <div class="col-6 col-sm-12 card column">
+              <div class="card-header">
+                <div class="card-title h5">20200610_212434</div>
+              </div>
+              <div class="card-body">size: 2851168</div>
+              <div class="card-footer">
+                <div class="btn-group btn-group-block">
+                  <a
+                    href=""
+                    download="20200610_212434.zip"
+                    class="btn btn-primary disabled"
+                    >Download</a
+                  ><button class="btn">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-sm-12 card column">
+              <div class="card-header">
+                <div class="card-title h5">20200610_211301</div>
+              </div>
+              <div class="card-body">size: 1797332</div>
+              <div class="card-footer">
+                <div class="btn-group btn-group-block">
+                  <a
+                    href="filesystem:https://144lab.github.io/persistent/20200610_211301/20200610_211301.zip"
+                    download="20200610_211301.zip"
+                    class="btn btn-primary"
+                    >Download</a
+                  ><button class="btn">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="column col-6 col-sm-12 card">
+              <div class="card-header">
+                <div class="card-title h5">20200610_204043</div>
+              </div>
+              <div class="card-body">size: 3942793</div>
+              <div class="card-footer">
+                <div class="btn-group-block btn-group">
+                  <a
+                    href=""
+                    download="20200610_204043.zip"
+                    class="btn btn-primary disabled"
+                    >Download</a
+                  ><button class="btn">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="column col-6 col-sm-12 card">
+              <div class="card-header">
+                <div class="card-title h5">20200610_201409</div>
+              </div>
+              <div class="card-body">size: 3244796</div>
+              <div class="card-footer">
+                <div class="btn-group btn-group-block">
+                  <a
+                    href=""
+                    download="20200610_201409.zip"
+                    class="disabled btn btn-primary"
+                    >Download</a
+                  ><button class="btn">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="column col-6 col-sm-12 card">
+              <div class="card-header">
+                <div class="card-title h5">20200610_193128</div>
+              </div>
+              <div class="card-body">size: 5226382</div>
+              <div class="card-footer">
+                <div class="btn-group btn-group-block">
+                  <a
+                    href=""
+                    download="20200610_193128.zip"
+                    class="btn btn-primary disabled"
+                    >Download</a
+                  ><button class="btn">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-sm-12 card column">
+              <div class="card-header">
+                <div class="card-title h5">20200610_181223</div>
+              </div>
+              <div class="card-body">size: 9683502</div>
+              <div class="card-footer">
+                <div class="btn-group-block btn-group">
+                  <a
+                    href=""
+                    download="20200610_181223.zip"
+                    class="btn btn-primary disabled"
+                    >Download</a
+                  ><button class="btn">Delete</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-sm-12 card column">
+              <div class="card-header">
+                <div class="h5 card-title">20200610_113235</div>
+              </div>
+              <div class="card-body">size: 5023121</div>
+              <div class="card-footer">
+                <div class="btn-group btn-group-block">
+                  <a
+                    href="filesystem:https://144lab.github.io/persistent/20200610_113235/20200610_113235.zip"
+                    download="20200610_113235.zip"
+                    class="btn btn-primary"
+                    >Download</a
+                  ><button class="btn">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>

@@ -5,28 +5,30 @@ import (
 	"runtime"
 	"syscall/js"
 
-	"github.com/gopherjs/vecty"
+	"github.com/nobonobo/wecty"
 )
 
 // TopView ...
 type TopView struct {
-	vecty.Core
+	wecty.Core
 	recorder         *Recorder
-	FirmwareRevision string    `vecty:prop`
-	LastRri          Rri       `vecty:"prop"`
-	LastEnv          Env       `vecty:"prop"`
-	Connected        bool      `vecty:"prop"`
-	Stopped          bool      `vecty:"prop"`
-	RawSize          int       `vecty:"prop"`
-	RriSize          int       `vecty:"prop"`
-	EnvSize          int       `vecty:"prop"`
-	FileList         *FileList `vecty:"prop"`
+	noSleep          js.Value
+	FirmwareRevision string
+	LastRri          Rri
+	LastEnv          Env
+	Connected        bool
+	Stopped          bool
+	RawSize          int
+	RriSize          int
+	EnvSize          int
+	FileList         *FileList
 }
 
 // NewTopView ...
 func NewTopView() *TopView {
 	top := &TopView{}
 	top.recorder = NewRecorder(js.FuncOf(top.Event))
+	top.noSleep = window.Get("NoSleep").New()
 	top.FileList = &FileList{
 		updater:  top,
 		recorder: top.recorder,
@@ -35,9 +37,10 @@ func NewTopView() *TopView {
 }
 
 // OnClickStart ...
-func (c *TopView) OnClickStart(event *vecty.Event) {
-	console.Call("log", "start")
-	window.Get("noSleep").Call("enable")
+func (c *TopView) OnClickStart(ev js.Value) interface{} {
+	console.Call("log", "start", ev)
+	ev.Call("preventDefault")
+	c.noSleep.Call("enable")
 	go func() {
 		c.RawSize = 0
 		c.RriSize = 0
@@ -83,14 +86,16 @@ func (c *TopView) OnClickStart(event *vecty.Event) {
 		c.Stopped = false
 		log.Println(c.Connected, c.Stopped)
 		c.FirmwareRevision = c.recorder.GetVersion()
-		vecty.Rerender(c)
+		wecty.Rerender(c)
 	}()
+	return nil
 }
 
 // OnClickStop ...
-func (c *TopView) OnClickStop(event *vecty.Event) {
-	console.Call("log", "stop")
-	window.Get("noSleep").Call("disable")
+func (c *TopView) OnClickStop(ev js.Value) interface{} {
+	console.Call("log", "stop", ev)
+	ev.Call("preventDefault")
+	c.noSleep.Call("disable")
 	go func() {
 		ch := make(chan js.Value)
 		success := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -117,8 +122,9 @@ func (c *TopView) OnClickStop(event *vecty.Event) {
 			return
 		}
 		c.Stopped = true
-		vecty.Rerender(c)
+		wecty.Rerender(c)
 	}()
+	return nil
 }
 
 // Event ...
@@ -134,7 +140,7 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 	case "connected":
 	case "started":
 	case "disconnected":
-		c.OnClickStop(nil)
+		c.OnClickStop(js.Null())
 	case "stopped":
 		go func() {
 			console.Call("log", "build:", args[1])
@@ -146,14 +152,14 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 		switch args[1].String() {
 		case "waveform.bin":
 			c.RawSize += 80
-			vecty.Rerender(c)
+			wecty.Rerender(c)
 		case "rri.csv":
 			c.RriSize += args[2].Get("Rri").Length()
 			c.LastRri = Rri{
 				Timestamp: uint32(args[2].Get("Timestamp").Int()),
 				Rri:       uint16(args[2].Get("Rri").Index(7).Int()),
 			}
-			vecty.Rerender(c)
+			wecty.Rerender(c)
 		case "environment.csv":
 			c.EnvSize++
 			c.LastEnv = Env{
@@ -164,7 +170,7 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 				EstTemperature:  args[2].Get("EstTemperature").Float(),
 				BatteryLevel:    uint8(args[2].Get("BatteryLevel").Int()),
 			}
-			vecty.Rerender(c)
+			wecty.Rerender(c)
 		default:
 			console.Call("log", "unknown file", args[1])
 		}
@@ -176,7 +182,7 @@ func (c *TopView) Event(this js.Value, args []js.Value) interface{} {
 func (c *TopView) Update() {
 	c.FileList.Update(func() {
 		console.Call("log", "render")
-		vecty.Rerender(c)
+		wecty.Rerender(c)
 		runtime.GC()
 	})
 }
