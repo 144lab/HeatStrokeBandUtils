@@ -325,10 +325,10 @@ class HrmRecorder {
     const tm = data.getUint32(0, true);
     var rri = [];
     for (var i = 0; i < 8; i++) {
-      rri.push(data.getUint16(4, true));
+      rri.push(data.getUint16(4 + i * 2, true));
     }
-    const led = data.getUint8(6);
-    const seq = data.getUint8(7);
+    const led = data.getUint8(20);
+    const seq = data.getUint8(21);
     if (this.rriFile != null) {
       const file = this.rriFile;
       await this._write(
