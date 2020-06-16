@@ -12,6 +12,7 @@ import (
 func main() {
 	posix := time.Now().Unix()
 	log.Println("posix:", posix)
+	wecty.AddMeta("viewport", "width=device-width,initial-scale=1")
 	wecty.AddStylesheet("./assets/spectre.min.css")
 	wecty.AddStylesheet("./assets/spectre-icons.min.css")
 	wecty.AddStylesheet("./assets/spectre-exp.min.css")
