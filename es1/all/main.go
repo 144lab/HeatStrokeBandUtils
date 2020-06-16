@@ -10,6 +10,7 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile)
+	wecty.AddMeta("viewport", "width=device-width,initial-scale=1")
 	wecty.AddStylesheet("./assets/css/spectre.min.css")
 	wecty.AddStylesheet("./assets/css/spectre-icons.min.css")
 	wecty.AddStylesheet("./assets/css/spectre-exp.min.css")
