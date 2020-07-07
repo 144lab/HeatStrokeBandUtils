@@ -145,6 +145,60 @@ func (c *Top) Render() wecty.HTML {
 				wecty.Class{
 					"form-horizontal": true,
 				},
+				wecty.Event("submit", c.OnSetCoreTemp),
+				wecty.Tag("div", 					
+					wecty.Class{
+						"form-group": true,
+					},
+					wecty.Tag("div", 						
+						wecty.Class{
+							"col-2": true,
+							"col-sm-12": true,
+						},
+						wecty.Tag("label", 							
+							wecty.Attr("for", "color"),
+							wecty.Class{
+								"form-label": true,
+							},
+							wecty.Text("Set Core Temp"),
+						),
+					),
+					wecty.Tag("div", 						
+						wecty.Class{
+							"col-10": true,
+							"col-sm-12": true,
+						},
+						wecty.Tag("div", 							
+							wecty.Class{
+								"input-group": true,
+							},
+							
+							wecty.Tag("input", 								
+								wecty.Attr("type", "number"),
+								wecty.Attr("name", "coreTemp"),
+								wecty.Attr("value", "37.0"),
+								wecty.Attr("step", "0.1"),
+								wecty.Class{
+									"form-input": true,
+								},
+								wecty.Attr("style", "max-width: 400px;"),
+							),
+							wecty.Tag("button", 								
+								wecty.Class{
+									"btn": true,
+									"input-group-btn": true,
+									"disabled": true,
+								},
+								wecty.Text("SEND"),
+							),
+						),
+					),
+				),
+			),
+			wecty.Tag("form", 				
+				wecty.Class{
+					"form-horizontal": true,
+				},
 				wecty.Event("submit", c.OnShutdown),
 				wecty.Tag("div", 					
 					wecty.Class{

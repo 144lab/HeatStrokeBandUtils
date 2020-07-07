@@ -1,8 +1,10 @@
 package views
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"log"
+	"strconv"
 	"strings"
 	"syscall/js"
 	"time"
@@ -64,14 +66,6 @@ func (c *Top) OnConnect(ev js.Value) interface{} {
 			return
 		}
 		c.Connected = true
-		/*
-			c.recorder.Call("start").Call("then", success, fail)
-			if err := <-ch; !err.IsNull() {
-				js.Global().Call("alert", err)
-				return
-			}
-			c.Stopped = false
-		*/
 		log.Println(c.Connected, c.Stopped)
 		c.FirmwareRevision = c.recorder.GetVersion()
 		wecty.Rerender(c)
@@ -107,14 +101,6 @@ func (c *Top) OnDisconnect(ev js.Value) interface{} {
 			return
 		}
 		c.Connected = false
-		/*
-			c.recorder.Call("stop").Call("then", success, fail)
-			if err := <-ch; !err.IsNull() {
-				js.Global().Call("alert", err)
-				return
-			}
-			c.Stopped = true
-		*/
 		wecty.Rerender(c)
 	}()
 	return nil
@@ -132,6 +118,23 @@ func (c *Top) OnSetLED(ev js.Value) interface{} {
 	}
 	log.Println("set led color:", b)
 	c.recorder.Call("writeValue", bytesToJS(append([]byte{0xfa, 0x01}, b...)))
+	return nil
+}
+
+// OnSetCoreTemp ...
+func (c *Top) OnSetCoreTemp(ev js.Value) interface{} {
+	ev.Call("preventDefault")
+	tempStr := ev.Get("target").Get("coreTemp").Get("value").String()
+	temp, err := strconv.ParseFloat(tempStr, 64)
+	if err != nil {
+		js.Global().Call("alert", err.Error())
+		log.Println(err)
+		return nil
+	}
+	log.Println("set core temp:", temp)
+	b := []byte{0, 0}
+	binary.LittleEndian.PutUint16(b[0:], uint16(temp*100))
+	c.recorder.Call("writeValue", bytesToJS(append([]byte{0xfa, 0x02}, b...)))
 	return nil
 }
 
