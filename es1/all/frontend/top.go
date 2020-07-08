@@ -3,6 +3,7 @@ package frontend
 import (
 	"log"
 	"runtime"
+	"strconv"
 	"syscall/js"
 
 	"github.com/nobonobo/wecty"
@@ -17,6 +18,7 @@ type TopView struct {
 	Connected bool
 	Stopped   bool
 	FileList  *FileList
+	Mode      string
 }
 
 // NewTopView ...
@@ -29,7 +31,14 @@ func NewTopView() *TopView {
 		updater:  top,
 		recorder: top.recorder,
 	}
+	top.Mode = "0xfd"
 	return top
+}
+
+// OnModeChange ...
+func (c *TopView) OnModeChange(ev js.Value) interface{} {
+	c.Mode = ev.Get("target").Get("value").String()
+	return nil
 }
 
 // OnClickStart ...
@@ -37,6 +46,13 @@ func (c *TopView) OnClickStart(ev js.Value) interface{} {
 	console.Call("log", "start", ev)
 	ev.Call("preventDefault")
 	c.noSleep.Call("enable")
+	mode, err := strconv.ParseInt(c.Mode[2:], 16, 9)
+	if err != nil {
+		console.Call("log", "invalue mode: "+c.Mode)
+		window.Call("alert", "invalue mode: "+c.Mode)
+		return nil
+	}
+	c.recorder.Call("setMode", mode)
 	go func() {
 		c.inform.RawSize = 0
 		c.inform.RriSize = 0

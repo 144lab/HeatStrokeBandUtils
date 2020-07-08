@@ -28,6 +28,7 @@ function formatDate(date, format) {
 
 class HrmRecorder {
   constructor(evnetDispatcher) {
+    this.mode = 0xfd;
     this.dispatcher = evnetDispatcher;
     this.fs = null;
     this.errCount = 0;
@@ -175,6 +176,10 @@ class HrmRecorder {
     });
   }
 
+  setMode(mode) {
+    this.mode = mode;
+  }
+
   async connect(device = null) {
     if (this.device != null) {
       await this.device.gatt.disconnect();
@@ -244,7 +249,7 @@ class HrmRecorder {
     } catch (x) {
       console.log("catch:", x);
     }
-    await this.write.writeValue(new Uint8Array([0xfd])); // ENTER_RAW_MODE
+    await this.write.writeValue(new Uint8Array([this.mode])); // ENTER_XXX_MODE
     await this.rawNotify.startNotifications();
     await this.rriNotify.startNotifications();
     await this.envNotify.startNotifications();
