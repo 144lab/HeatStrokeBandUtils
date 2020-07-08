@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"archive/zip"
+	"log"
 	"path/filepath"
 	"syscall/js"
 )
@@ -103,6 +104,7 @@ func (r *Recorder) GetURL(d string) string {
 }
 
 func (r *Recorder) writeZIP(dir, zipFile js.Value) string {
+	log.Println("write zip:", dir)
 	syncCh := make(chan bool)
 	w := &FileWriter{file: zipFile}
 	zw := zip.NewWriter(w)

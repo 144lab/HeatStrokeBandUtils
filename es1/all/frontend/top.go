@@ -60,21 +60,18 @@ func (c *TopView) OnClickStart(ev js.Value) interface{} {
 		})
 		defer success2.Release()
 		c.recorder.Call("getDevice").Call("then", success2, fail)
-		//if err := <-ch; !err.IsNull() {
 		if err := <-ch; !err.IsNull() {
 			window.Call("alert", err)
 			return
 		}
 		console.Call("log", device)
 		c.recorder.Call("connect", device).Call("then", success, fail)
-		//if err := <-ch; !err.IsNull() {
 		if err := <-ch; !err.IsNull() {
 			window.Call("alert", err)
 			return
 		}
 		c.Connected = true
 		c.recorder.Call("start").Call("then", success, fail)
-		//if err := <-ch; !err.IsNull() {
 		if err := <-ch; !err.IsNull() {
 			window.Call("alert", err)
 			return
