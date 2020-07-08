@@ -5,6 +5,7 @@ const rriNotifyUUID = "b84ea3e8-b237-4b95-a394-6911180b7638";
 const envNotifyUUID = "62fbd229-6edd-4d1a-b554-5c4e1bb29169";
 
 const deviceInfoUUID = 0x180a;
+const deviceSerialUUID = 0x2a25;
 const firmwareRevUUID = 0x2a26;
 
 const fileNames = ["waveform.bin", "rri.csv", "environment.csv", "VERSION"];
@@ -206,15 +207,11 @@ class HrmRecorder {
     });
     this.server = await this.device.gatt.connect();
     this.service = await this.server.getPrimaryService(serviceUUID);
-    try {
-      let deviceinfo = await this.server.getPrimaryService(
-        "device_information"
-      );
-      let firmwareRev = await deviceinfo.getCharacteristic(firmwareRevUUID);
-      this.firmwareRevString = new TextDecoder().decode(
-        (await firmwareRev.readValue()).buffer
-      );
-    } catch {}
+    let deviceinfo = await this.server.getPrimaryService("device_information");
+    let firmwareRev = await deviceinfo.getCharacteristic(firmwareRevUUID);
+    this.firmwareRevString = new TextDecoder().decode(
+      (await firmwareRev.readValue()).buffer
+    );
     this.write = await this.service.getCharacteristic(writeUUID);
     this.rawNotify = await this.service.getCharacteristic(rawNotifyUUID);
     this.rawNotify.addEventListener(
@@ -297,7 +294,9 @@ class HrmRecorder {
     });
     this._write(
       versionFile,
-      new Blob([this.firmwareRevString], { type: "text/plain" })
+      new Blob([this.firmwareRevString], {
+        type: "text/plain",
+      })
     );
     this.dispatcher("started", this.current.fullPath);
   }
