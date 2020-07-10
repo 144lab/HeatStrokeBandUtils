@@ -1,0 +1,47 @@
+<head>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/spectre.css/dist/spectre.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css"
+  />
+  <style>
+    @keyframes heartrateBlink {
+      0% {
+        background: white;
+      }
+      100% {
+        background: rgb(200, 200, 200);
+      }
+    }
+    .heartrate {
+      position: absolute;
+      bottom: 0;
+      width: 20%;
+      height: 20%;
+      animation-name: heartrateBlink;
+      animation-duration: 0.3s;
+      animation-direction: alternate;
+      animation-iteration-count: infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="heartrate"></div>
+  <script>
+    const f = 1 / 20;
+    const hr = document.querySelector(".heartrate");
+    const fn = (ms) => {
+      const t = ms / 1000.0;
+      hr.style.animationDuration = 0.3 + 0.1 * Math.sin(2 * Math.PI * f * t);
+      requestAnimationFrame(fn);
+    };
+    fn();
+  </script>
+</body>
