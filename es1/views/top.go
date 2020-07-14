@@ -117,7 +117,7 @@ func (c *Top) OnSetLED(ev js.Value) interface{} {
 		return nil
 	}
 	log.Println("set led color:", b)
-	c.recorder.Call("writeValue", bytesToJS(append([]byte{0xfa, 0x01}, b...)))
+	c.recorder.Write(append([]byte{0xfa, 0x01}, b...))
 	return nil
 }
 
@@ -134,7 +134,7 @@ func (c *Top) OnSetCoreTemp(ev js.Value) interface{} {
 	log.Println("set core temp:", temp)
 	b := []byte{0, 0}
 	binary.LittleEndian.PutUint16(b[0:], uint16(temp*100))
-	c.recorder.Call("writeValue", bytesToJS(append([]byte{0xfa, 0x02}, b...)))
+	c.recorder.Write(append([]byte{0xfa, 0x02}, b...))
 	return nil
 }
 
@@ -142,7 +142,7 @@ func (c *Top) OnSetCoreTemp(ev js.Value) interface{} {
 func (c *Top) OnShutdown(ev js.Value) interface{} {
 	ev.Call("preventDefault")
 	log.Println("Shutdown")
-	c.recorder.Call("writeValue", bytesToJS([]byte{0xf9}))
+	c.recorder.Write([]byte{0xf9})
 	time.AfterFunc(500*time.Millisecond, func() { c.OnDisconnect(ev) })
 	return nil
 }
@@ -152,9 +152,18 @@ func (c *Top) OnFactoryReset(ev js.Value) interface{} {
 	ev.Call("preventDefault")
 	if js.Global().Call("confirm", "Do you want to initialize the connected device?").Bool() {
 		log.Println("FactoryReset")
-		c.recorder.Call("writeValue", bytesToJS([]byte{0xff}))
+		c.recorder.Write([]byte{0xff})
 		time.AfterFunc(500*time.Millisecond, func() { c.OnDisconnect(ev) })
 	}
+	return nil
+}
+
+// OnEnterUF2 ...
+func (c *Top) OnEnterUF2(ev js.Value) interface{} {
+	ev.Call("preventDefault")
+	log.Println("EnterUF2")
+	c.recorder.Write([]byte{0xf8})
+	time.AfterFunc(500*time.Millisecond, func() { c.OnDisconnect(ev) })
 	return nil
 }
 
@@ -162,7 +171,7 @@ func (c *Top) OnFactoryReset(ev js.Value) interface{} {
 func (c *Top) OnEnterOTA(ev js.Value) interface{} {
 	ev.Call("preventDefault")
 	log.Println("EnterOTA")
-	c.recorder.Call("writeValue", bytesToJS([]byte{0xfe}))
+	c.recorder.Write([]byte{0xfe})
 	time.AfterFunc(500*time.Millisecond, func() { c.OnDisconnect(ev) })
 	return nil
 }

@@ -64,6 +64,10 @@ func (r *Recorder) Delete(dir string) {
 	<-ch
 }
 
+func (r *Recorder) Write(b []byte) {
+	r.Value.Call("writeValue", bytesToJS(b))
+}
+
 // GetURL ...
 func (r *Recorder) GetURL(d string) string {
 	ch := make(chan string, 1)

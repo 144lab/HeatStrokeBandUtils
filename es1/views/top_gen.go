@@ -324,6 +324,51 @@ func (c *Top) Render() wecty.HTML {
 					),
 				),
 			),
+			wecty.Tag("form", 				
+				wecty.Class{
+					"form-horizontal": true,
+				},
+				wecty.Event("submit", c.OnEnterUF2),
+				wecty.Tag("div", 					
+					wecty.Class{
+						"form-group": true,
+					},
+					wecty.Tag("div", 						
+						wecty.Class{
+							"col-2": true,
+							"col-sm-12": true,
+						},
+						wecty.Tag("label", 							
+							wecty.Class{
+								"form-label": true,
+							},
+							wecty.Text("Enter UF2 Mode"),
+							
+							wecty.Tag("br", ),
+							wecty.Text("(for v0.3.9 or later)"),
+						),
+					),
+					wecty.Tag("div", 						
+						wecty.Class{
+							"col-10": true,
+							"col-sm-12": true,
+						},
+						wecty.Tag("div", 							
+							wecty.Class{
+								"input-group": true,
+							},
+							wecty.Tag("button", 								
+								wecty.Class{
+									"btn": true,
+									"input-group-btn": true,
+									"disabled": true,
+								},
+								wecty.Text("Enter"),
+							),
+						),
+					),
+				),
+			),
 		),
 	)
 }
