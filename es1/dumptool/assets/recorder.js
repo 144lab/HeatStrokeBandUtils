@@ -138,7 +138,35 @@ class HrmRecorder {
   }
 
   async postRecord(s) {
-    const data = buf2hex(new Uint8Array(s));
+    var b = new Uint8Array(s);
+    var dv = new DataView(b.buffer);
+    var id = dv.getUint32(0, true);
+    var typ = dv.getUint8(4);
+    var len = dv.getUint8(5);
+    var msg = [];
+    switch (typ) {
+      case 0x01:
+        var ts = dv.getUint32(6, true);
+        var rri = [];
+        for (var i = 0; i < 8; i++) {
+          rri.push(dv.getUint16(10 + i * 2, true));
+        }
+        var led = dv.getUint8(26);
+        var seq = dv.getUint8(27);
+        msg = ["RRI:", id, ts, JSON.stringify(rri), led, seq];
+        break;
+      case 0x02:
+        var ts = dv.getUint32(6, true);
+        var hm = dv.getUint16(10, true) / 100.0;
+        var tp = dv.getUint16(12, true) / 100.0;
+        var st = dv.getUint16(14, true) / 100.0;
+        var et = dv.getUint16(16, true) / 100.0;
+        var bat = dv.getUint8(18);
+        var flags = dv.getUint8(19);
+        msg = ["ENV:", id, ts, hm, tp, st, et, bat, flags];
+        break;
+    }
+    var data = msg.join(", ");
     var l = document.getElementById("log");
     l.value += data + "\n";
     console.log(data);

@@ -166,6 +166,8 @@ func (c *Top) Render() wecty.HTML {
 								wecty.Class{
 									"form-input": true,
 								},
+								wecty.Attr("min", "0"),
+								wecty.Attr("max", "4294967295"),
 								wecty.Attr("placeholder", "start-id"),
 							),
 							
@@ -175,6 +177,8 @@ func (c *Top) Render() wecty.HTML {
 								wecty.Class{
 									"form-input": true,
 								},
+								wecty.Attr("min", "1"),
+								wecty.Attr("max", "65535"),
 								wecty.Attr("placeholder", "length"),
 							),
 							wecty.Tag("button", 								
