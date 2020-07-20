@@ -13,15 +13,15 @@ var urlsToCache = [
   "assets/css/app.css",
   "assets/css/spectre.min.css",
   "assets/nosleep.min.js",
-  "assets/manifest.json",
   "assets/serviceworker.js",
   "assets/app.js",
 ];
 
+// 残したいキャッシュのバージョンをこの配列に入れる
+// 基本的に現行の1つだけでよい。他は削除される。
 const CACHE_KEYS = [CACHE_NAME];
 
 self.addEventListener("install", function (event) {
-  console.log("[ServiceWorker] Install");
   event.waitUntil(
     caches
       .open(CACHE_NAME) // 上記で指定しているキャッシュ名
@@ -32,8 +32,8 @@ self.addEventListener("install", function (event) {
   );
 });
 
-self.addEventListener("activate", function (event) {
-  console.log("[ServiceWorker] Activate");
+//新しいバージョンのServiceWorkerが有効化されたとき
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
@@ -50,49 +50,61 @@ self.addEventListener("activate", function (event) {
   );
 });
 
-// サービスワーカー有効化に必須
 self.addEventListener("fetch", function (event) {
-  //ブラウザが回線に接続しているかをboolで返してくれる
   var online = navigator.onLine;
 
-  //回線が使えるときの処理
+  // ファイルパス ~/test.htmlにアクセスすると、このファイル自体は無いがServiceWorkerがResponseを作成して表示してくれる
+  if (event.request.url.indexOf("test.html") != -1) {
+    return event.respondWith(
+      new Response("任意のURLの内容をここで自由に返却できる")
+    );
+  }
+
   if (online) {
+    console.log("ONLINE");
+    //このパターンの処理では、Responseだけクローンすれば問題ない
+    //cloneEventRequest = event.request.clone();
     event.respondWith(
       caches.match(event.request).then(function (response) {
         if (response) {
+          //オンラインでもローカルにキャッシュでリソースがあればそれを返す
+          //ここを無効にすればオンラインのときは常にオンラインリソースを取りに行き、その最新版をキャッシュにPUTする
           return response;
         }
-        //ローカルにキャッシュがあればすぐ返して終わりですが、
-        //無かった場合はここで新しく取得します
+        //request streem 1
         return fetch(event.request)
           .then(function (response) {
-            // 取得できたリソースは表示にも使うが、キャッシュにも追加しておきます
-            // ただし、Responseはストリームなのでキャッシュのために使用してしまうと、ブラウザの表示で不具合が起こる(っぽい)ので、複製しましょう
+            //ローカルキャッシュになかったからネットワークから落とす
+            //ネットワークから落とせてればここでリソースが返される
+
+            // Responseはストリームなのでキャッシュで使用してしまうと、ブラウザの表示で不具合が起こる(っぽい)ので、複製したものを使う
             cloneResponse = response.clone();
+
             if (response) {
-              //ここ&&に修正するかもです
               if (response || response.status == 200) {
-                //現行のキャッシュに追加
+                console.log("正常にリソースを取得");
                 caches.open(CACHE_NAME).then(function (cache) {
+                  console.log("キャッシュへ保存");
+                  //初回表示でエラー起きているが致命的でないので保留
                   cache.put(event.request, cloneResponse).then(function () {
-                    //正常にキャッシュ追加できたときの処理(必要であれば)
+                    console.log("保存完了");
                   });
                 });
               } else {
-                //正常に取得できなかったときにハンドリングしてもよい
-                return response;
+                return event.respondWith(
+                  new Response("200以外のエラーをハンドリングしたりできる")
+                );
               }
               return response;
             }
           })
           .catch(function (error) {
-            //デバッグ用
             return console.log(error);
           });
       })
     );
   } else {
-    //オフラインのときの制御
+    console.log("OFFLINE");
     event.respondWith(
       caches.match(event.request).then(function (response) {
         // キャッシュがあったのでそのレスポンスを返す
@@ -101,8 +113,6 @@ self.addEventListener("fetch", function (event) {
         }
         //オフラインでキャッシュもなかったパターン
         return caches.match("offline.html").then(function (responseNodata) {
-          //適当な変数にオフラインのときに渡すリソースを入れて返却
-          //今回はoffline.htmlを返しています
           return responseNodata;
         });
       })
