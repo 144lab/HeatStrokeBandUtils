@@ -6,7 +6,6 @@ var urlsToCache = [
   "../main.wasm",
   "recorder.js",
   "icon.png",
-  "css",
   "css/spectre-icons.min.css",
   "css/spectre-exp.min.css",
   "css/app.css",
