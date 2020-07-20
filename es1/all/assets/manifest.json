@@ -2,7 +2,7 @@
   "name": "MT-BAND Utility",
   "short_name": "MT-BAND-Util",
   "description": "MT-BAND むけユーティリティ",
-  "start_url": "/",
+  "start_url": "/HeatStrokeBandUtils/es1/all/dist/",
   "display": "standalone",
   "background_color": "#444444",
   "theme_color": "#cccccc",
