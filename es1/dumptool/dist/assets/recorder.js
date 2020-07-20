@@ -153,7 +153,7 @@ class HrmRecorder {
         }
         var led = dv.getUint8(26);
         var seq = dv.getUint8(27);
-        msg = ["RRI:", id, ts, JSON.stringify(rri), led, seq];
+        msg = ["RRI:", id, ts] + rri + [led, seq];
         break;
       case 0x02:
         var ts = dv.getUint32(6, true);
