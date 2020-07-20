@@ -17,7 +17,7 @@ func main() {
 	wecty.AddStylesheet("./assets/css/app.css")
 	wecty.LoadScript("./assets/nosleep.min.js")
 	wecty.LoadScript("./assets/recorder.js")
-	wecty.LoadScript("./assets/app.js")
+	wecty.LoadScript("./app.js")
 	top := frontend.NewTopView()
 	wecty.RenderBody(top)
 	select {}
