@@ -20,7 +20,7 @@ var urlsToCache = [
 
 const CACHE_KEYS = [CACHE_NAME];
 
-self.addEventListener("install", function (e) {
+self.addEventListener("install", function (event) {
   console.log("[ServiceWorker] Install");
   event.waitUntil(
     caches
@@ -32,7 +32,7 @@ self.addEventListener("install", function (e) {
   );
 });
 
-self.addEventListener("activate", function (e) {
+self.addEventListener("activate", function (event) {
   console.log("[ServiceWorker] Activate");
   event.waitUntil(
     caches.keys().then((keys) => {
