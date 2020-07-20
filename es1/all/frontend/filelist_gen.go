@@ -25,6 +25,9 @@ func (c *FileList) Render() wecty.HTML {
 					},
 					wecty.Text("Download Files"),
 				),
+				wecty.Tag("div",
+					wecty.Class{"heartrate": true},
+				),
 			),
 			wecty.Tag("div",
 				wecty.Class{

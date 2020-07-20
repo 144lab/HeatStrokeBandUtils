@@ -35,6 +35,11 @@ func NewTopView() *TopView {
 	return top
 }
 
+// Mount ...
+func (c *TopView) Mount() {
+	js.Global().Call("startDummyHeartRate")
+}
+
 // OnModeChange ...
 func (c *TopView) OnModeChange(ev js.Value) interface{} {
 	c.Mode = ev.Get("target").Get("value").String()
