@@ -5,6 +5,10 @@ GO := go
 export index_html
 override define index_html
 <!DOCTYPE html>
+<head>
+<link rel="manifest" href="/assets/manifest.json">
+</head>
+<body>
 <script src="wasm_exec.js"></script><script>
 (async () => {
 	const resp = await fetch('main.wasm');
@@ -20,6 +24,7 @@ override define index_html
 	go.run(result.instance);
 })();
 </script>
+</body>
 endef
 
 .PHONY: all clean run dist

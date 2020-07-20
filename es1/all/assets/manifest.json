@@ -1,0 +1,16 @@
+{
+  "name": "MT-BAND Utility",
+  "short_name": "MT-BAND-Util",
+  "description": "MT-BAND むけユーティリティ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#444444",
+  "theme_color": "#cccccc",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

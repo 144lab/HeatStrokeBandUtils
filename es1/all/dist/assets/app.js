@@ -6,3 +6,10 @@ const startDummyHeartRate = (ms) => {
   requestAnimationFrame(startDummyHeartRate);
 };
 window.startDummyHeartRate = startDummyHeartRate;
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/assets/serviceworker.js")
+    .then(function () {
+      console.log("Service Worker is registered!!");
+    });
+}
