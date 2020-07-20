@@ -8,7 +8,7 @@ const startDummyHeartRate = (ms) => {
 window.startDummyHeartRate = startDummyHeartRate;
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/assets/serviceworker.js")
+    .register("./assets/serviceworker.js")
     .then(function () {
       console.log("Service Worker is registered!!");
     });
