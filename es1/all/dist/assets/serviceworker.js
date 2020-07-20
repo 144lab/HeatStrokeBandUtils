@@ -1,20 +1,19 @@
 var CACHE_NAME = "fb-cache-v8-10";
 
 var urlsToCache = [
-  "index.html",
-  "wasm_exec.js",
-  "main.wasm",
-  "assets",
-  "assets/recorder.js",
-  "assets/icon.png",
-  "assets/css",
-  "assets/css/spectre-icons.min.css",
-  "assets/css/spectre-exp.min.css",
-  "assets/css/app.css",
-  "assets/css/spectre.min.css",
-  "assets/nosleep.min.js",
-  "assets/serviceworker.js",
-  "assets/app.js",
+  "../index.html",
+  "../wasm_exec.js",
+  "../main.wasm",
+  "recorder.js",
+  "icon.png",
+  "css",
+  "css/spectre-icons.min.css",
+  "css/spectre-exp.min.css",
+  "css/app.css",
+  "css/spectre.min.css",
+  "nosleep.min.js",
+  "serviceworker.js",
+  "app.js",
 ];
 
 // 残したいキャッシュのバージョンをこの配列に入れる
