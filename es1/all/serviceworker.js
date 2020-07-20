@@ -4,6 +4,8 @@ var urlsToCache = [
   "index.html",
   "wasm_exec.js",
   "main.wasm",
+  "serviceworker.js",
+  "app.js",
   "assets/recorder.js",
   "assets/icon.png",
   "assets/css/spectre-icons.min.css",
@@ -11,8 +13,6 @@ var urlsToCache = [
   "assets/css/app.css",
   "assets/css/spectre.min.css",
   "assets/nosleep.min.js",
-  "assets/serviceworker.js",
-  "assets/app.js",
 ];
 
 // 残したいキャッシュのバージョンをこの配列に入れる
