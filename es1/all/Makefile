@@ -45,3 +45,4 @@ dist:
 	echo "$$index_html" > $(DSTDIR)/index.html
 	cp $(shell $(GO) env GOROOT)/misc/wasm/wasm_exec.js $(DSTDIR)/wasm_exec.js
 	cp -Rf assets $(DSTDIR)/
+	cp -f serviceworker.js $(DSTDIR)/
