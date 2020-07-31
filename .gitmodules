@@ -1,0 +1,3 @@
+[submodule "es1/dumptool/dist"]
+	path = es1/dumptool/dist
+	url = git@github.com:144lab/mt-band-dumptool.git
