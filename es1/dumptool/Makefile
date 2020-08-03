@@ -1,6 +1,6 @@
 
 GO := go
-DIST=dist
+DIST=$(PWD)/dist
 
 export index_html
 override define index_html
@@ -22,10 +22,12 @@ override define index_html
 </script>
 endef
 
+.PHONY: all clean dist
+
 all: clean dist
 
 clean:
-	@-rm -rf $(DIST)
+	@-rm -rf $(DIST)/*
 
 dist:
 	mkdir -p $(DIST)

@@ -18,6 +18,7 @@ func main() {
 	wecty.AddStylesheet("./assets/spectre-exp.min.css")
 	wecty.AddStylesheet("./assets/app.css")
 	wecty.LoadScript("./assets/recorder.js")
+	wecty.LoadScript("./app.js")
 	wecty.RenderBody(views.NewTop())
 	select {}
 }

@@ -1,0 +1,16 @@
+{
+  "name": "MT-BAND Tools",
+  "short_name": "MT-BAND-Tools",
+  "description": "MT-BAND むけ開発ツール",
+  "start_url": "/HeatStrokeBandUtils/es1/dist/",
+  "display": "standalone",
+  "background_color": "#444444",
+  "theme_color": "#cccccc",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

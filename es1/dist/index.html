@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<head>
+<link rel="manifest" href="./assets/manifest.json">
+</head>
+<body>
 <script src="wasm_exec.js"></script><script>
 (async () => {
 	const resp = await fetch('main.wasm');
@@ -14,3 +18,4 @@
 	go.run(result.instance);
 })();
 </script>
+</body>
