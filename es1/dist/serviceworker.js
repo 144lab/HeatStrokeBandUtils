@@ -8,10 +8,10 @@ var urlsToCache = [
   "app.js",
   "assets/recorder.js",
   "assets/icon.png",
-  "assets/css/spectre-icons.min.css",
-  "assets/css/spectre-exp.min.css",
-  "assets/css/app.css",
-  "assets/css/spectre.min.css",
+  "assets/spectre-icons.min.css",
+  "assets/spectre-exp.min.css",
+  "assets/app.css",
+  "assets/spectre.min.css",
   "assets/nosleep.min.js",
 ];
 
