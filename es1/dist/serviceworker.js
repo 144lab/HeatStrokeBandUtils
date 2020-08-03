@@ -1,4 +1,4 @@
-var CACHE_NAME = "mt-band-cache-v1";
+var CACHE_NAME = "mt-band-tools-cache-v1";
 
 var urlsToCache = [
   "index.html",
