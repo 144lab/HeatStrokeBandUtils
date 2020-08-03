@@ -12,7 +12,6 @@ var urlsToCache = [
   "assets/spectre-exp.min.css",
   "assets/app.css",
   "assets/spectre.min.css",
-  "assets/nosleep.min.js",
 ];
 
 // 残したいキャッシュのバージョンをこの配列に入れる
