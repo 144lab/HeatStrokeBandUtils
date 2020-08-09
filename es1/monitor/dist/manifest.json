@@ -1,8 +1,8 @@
 {
-  "name": "PWA-Example1",
-  "short_name": "PWA-App1",
-  "description": "PWA Example Application",
-  "start_url": ".",
+  "name": "MT-BAND Monitor",
+  "short_name": "MT-BAND-Mon",
+  "description": "MT-BAND Monitor Utility",
+  "start_url": "/HeatStrokeBandUtils/es1/monitor/dist/",
   "display": "standalone",
   "background_color": "#444444",
   "theme_color": "#cccccc",
