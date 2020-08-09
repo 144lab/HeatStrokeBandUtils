@@ -1,4 +1,4 @@
-var CACHE_NAME = "pwa-example-v1";
+var CACHE_NAME = "mt-band-monitor-v1";
 
 console.log("loading: serviceworker");
 
