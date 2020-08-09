@@ -101,7 +101,9 @@ func (bt *BLE) onNotifyBattery(ev js.Value) {
 			buff := []byte{0x10, 0, 0, 0, 0, 0, 0}
 			binary.LittleEndian.PutUint32(buff[1:5], startID)
 			binary.LittleEndian.PutUint16(buff[5:7], uint16(size))
-			bt.writeValue(buff)
+			if err := bt.writeValue(buff); err != nil {
+				log.Println(err)
+			}
 		}()
 	}
 }
@@ -230,7 +232,10 @@ func (bt *BLE) Connect() {
 		}
 		b := []byte{0xfb, 0, 0, 0, 0}
 		binary.LittleEndian.PutUint32(b[1:5], uint32(time.Now().Unix()))
-		bt.writeValue(b)
+		if err := bt.writeValue(b); err != nil {
+			log.Println(err)
+		}
+		log.Println("connect successful")
 		bt.connect = true
 		bt.Update()
 	}()
