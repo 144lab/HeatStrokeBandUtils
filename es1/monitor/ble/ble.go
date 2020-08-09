@@ -101,11 +101,9 @@ func (bt *BLE) onNotifyBattery(ev js.Value) {
 			buff := []byte{0x10, 0, 0, 0, 0, 0, 0}
 			binary.LittleEndian.PutUint32(buff[1:5], startID)
 			binary.LittleEndian.PutUint16(buff[5:7], uint16(size))
-			go func() {
-				if err := bt.writeValue(buff); err != nil {
-					log.Println(err)
-				}
-			}()
+			if err := bt.writeValue(buff); err != nil {
+				log.Println(err)
+			}
 		}()
 	}
 }
@@ -219,27 +217,28 @@ func (bt *BLE) Connect() {
 			return
 		}
 		console.Call("log", write, recordStatus, recordNotify)
+		log.Println("bind")
 		bt.resources = append(bt.resources,
 			spago.Bind(recordNotify, "characteristicvaluechanged", bt.onNotifyRecord),
 		)
+		log.Println("startNotifications1")
 		if _, err := spago.Await(btRem.Call("startNotifications")); err != nil {
 			log.Print(err)
 			bt.Release()
 			return
 		}
+		log.Println("startNotifications2")
 		if _, err := spago.Await(recordNotify.Call("startNotifications")); err != nil {
 			log.Print(err)
 			bt.Release()
 			return
 		}
-		go func() {
-			log.Println("write rtc...")
-			b := []byte{0xfb, 0, 0, 0, 0}
-			binary.LittleEndian.PutUint32(b[1:5], uint32(time.Now().Unix()))
-			if err := bt.writeValue(b); err != nil {
-				log.Println(err)
-			}
-		}()
+		log.Println("write rtc...")
+		b := []byte{0xfb, 0, 0, 0, 0}
+		binary.LittleEndian.PutUint32(b[1:5], uint32(time.Now().Unix()))
+		if err := bt.writeValue(b); err != nil {
+			log.Println(err)
+		}
 		log.Println("connect successful")
 		bt.connect = true
 		bt.Update()
