@@ -1,0 +1,118 @@
+<body>
+  <header
+    class="navbar"
+    style="box-shadow: lightgrey 2px 2px 2px; padding: 1rem;"
+  >
+    <section class="navber-section">
+      <a
+        class="navbar-brand mr-2"
+        style="text-transform: uppercase; font-weight: bold;"
+        >MT-BAND Monitor</a
+      >
+    </section>
+  </header>
+  <main class="container" style="padding: 1rem;">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-3 col-sm-12">
+          <label class="form-label" for="input-example-1"
+            >{{spago.T("Device:", c.BLE.FwRevision)}}</label
+          >
+        </div>
+        <div class="col-9 col-sm-12">
+          <div class="btn-group">
+            <button
+              @click="{{c.OnStartClick}}"
+              class="btn btn-primary"
+              @='{{spago.ClassMap{"disabled":c.BLE.IsConnect()}}}'
+            >
+              Connect
+            </button>
+            <button
+              @click="{{c.OnStopClick}}"
+              class="btn"
+              @='{{spago.ClassMap{"disabled":!c.BLE.IsConnect()}}}'
+            >
+              Disconnect
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-3 col-sm-12">
+          <label class="form-label" for="input-example-1">Battery Remain</label>
+        </div>
+        <div class="col-9 col-sm-12" style="margin: auto;">
+          <div class="bar">
+            <div class="bar-item" style="width: {{c.BLE.CurrentEnv.Battery}}%;">
+              {{c.BLE.CurrentEnv.Battery}}%
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-3 col-sm-12">
+          <label class="form-label" for="input-example-1">Sensor Values</label>
+        </div>
+        <div class="col-9 col-sm-12">
+          <div class="columns">
+            <div class="input-group column col-4 col-xs-12">
+              <span class="input-group-addon addon-lg">BPM</span>
+              <input
+                type="text"
+                class="form-input input-lg"
+                readonly
+                value="{{c.BLE.BPM}}"
+              />
+            </div>
+            <div class="input-group column col-4 col-xs-12">
+              <span class="input-group-addon addon-lg">Humidity</span>
+              <input
+                type="text"
+                class="form-input input-lg"
+                readonly
+                value="{{c.BLE.CurrentEnv.GetHumidity()}}"
+              />
+            </div>
+            <div class="input-group column col-4 col-xs-12">
+              <span class="input-group-addon addon-lg">Temperature</span>
+              <input
+                type="text"
+                class="form-input input-lg"
+                readonly
+                value="{{c.BLE.CurrentEnv.GetTemperature()}}"
+              />
+            </div>
+            <div class="input-group column col-4 col-xs-12">
+              <span class="input-group-addon addon-lg">Skin-Temp.</span>
+              <input
+                type="text"
+                class="form-input input-lg"
+                readonly
+                value="{{c.BLE.CurrentEnv.GetSkinTemp()}}"
+              />
+            </div>
+            <div class="input-group column col-4 col-xs-12">
+              <span class="input-group-addon addon-lg">EST-Temp.</span>
+              <input
+                type="text"
+                class="form-input input-lg"
+                readonly
+                value="{{c.BLE.CurrentEnv.GetEstTemp()}}"
+              />
+            </div>
+            <div class="input-group column col-4 col-xs-12">
+              <span class="input-group-addon addon-lg">Flags</span>
+              <input
+                type="text"
+                class="form-input input-lg"
+                readonly
+                value="{{c.BLE.CurrentEnv.GetFlags()}}"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+</body>
