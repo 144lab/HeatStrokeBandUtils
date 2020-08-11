@@ -2,6 +2,7 @@ package ble
 
 import (
 	"encoding/binary"
+	"fmt"
 	"log"
 	"syscall/js"
 	"time"
@@ -45,6 +46,7 @@ func js2bytes(dv js.Value) []byte {
 // BLE ...
 type BLE struct {
 	Update        func()
+	Log           func(id uint32, s string)
 	resources     []jsutil.Releaser
 	connect       bool
 	write         js.Value
@@ -52,9 +54,10 @@ type BLE struct {
 	lastID        uint32
 	FwRevision    string
 	BatteryRemain int
+	CurrentRri    RriPayload
 	CurrentEnv    EnvPayload
-	average       *Average
-	BPM           string
+	MinID         uint32
+	MaxID         uint32
 }
 
 // Release ...
@@ -76,36 +79,37 @@ func (bt *BLE) writeValue(b []byte) error {
 	return err
 }
 
+// ReadRecordStatus ...
+func (bt *BLE) ReadRecordStatus() (minID, maxID uint32, err error) {
+	if bt.recordStatus.IsUndefined() {
+		return 0, 0, fmt.Errorf("initialize not yet")
+	}
+	v, err := jsutil.Await(bt.recordStatus.Call("readValue"))
+	if err != nil {
+		return 0, 0, err
+	}
+	b := js2bytes(v)
+	minID = binary.LittleEndian.Uint32(b[0:4])
+	maxID = binary.LittleEndian.Uint32(b[4:8])
+	return minID, maxID, nil
+}
+
+// SendRecordRequest ...
+func (bt *BLE) SendRecordRequest(minID, maxID uint32) error {
+	startID := minID
+	size := maxID - minID
+	buff := []byte{0x10, 0, 0, 0, 0, 0, 0}
+	binary.LittleEndian.PutUint32(buff[1:5], startID)
+	binary.LittleEndian.PutUint16(buff[5:7], uint16(size))
+	if err := bt.writeValue(buff); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (bt *BLE) onNotifyBattery(ev js.Value) {
 	bt.BatteryRemain = int(js2bytes(ev.Get("target").Get("value"))[0])
 	log.Printf("btRem: %d%%", bt.BatteryRemain)
-	if !bt.recordStatus.IsUndefined() {
-		go func() {
-			v, err := jsutil.Await(bt.recordStatus.Call("readValue"))
-			if err != nil {
-				log.Print(err)
-				return
-			}
-			b := js2bytes(v)
-			minID := binary.LittleEndian.Uint32(b[0:4])
-			maxID := binary.LittleEndian.Uint32(b[4:8])
-			log.Printf("record: min:%9d, max:%9d", minID, maxID)
-			startID := maxID - 10
-			if startID < minID {
-				startID = minID
-			}
-			if startID < bt.lastID {
-				startID = bt.lastID + 1
-			}
-			size := maxID - startID
-			buff := []byte{0x10, 0, 0, 0, 0, 0, 0}
-			binary.LittleEndian.PutUint32(buff[1:5], startID)
-			binary.LittleEndian.PutUint16(buff[5:7], uint16(size))
-			if err := bt.writeValue(buff); err != nil {
-				log.Println(err)
-			}
-		}()
-	}
 }
 
 func (bt *BLE) onNotifyRecord(ev js.Value) {
@@ -116,9 +120,19 @@ func (bt *BLE) onNotifyRecord(ev js.Value) {
 	default:
 		return
 	case 0x01:
-		bt.parseRriRecord(recordID, b[6:])
+		l, err := bt.ParseRriRecord(recordID, b[6:])
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		bt.Log(recordID, l)
 	case 0x02:
-		bt.parseEnvRecord(recordID, b[6:])
+		l, err := bt.ParseEnvRecord(recordID, b[6:])
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		bt.Log(recordID, l)
 	}
 	bt.lastID = recordID
 }
@@ -142,9 +156,6 @@ func (bt *BLE) Connect() {
 				bt.Release()
 			}),
 		)
-		bt.resources = append(bt.resources, jsutil.ReleaserFunc(func() {
-			device.Get("gatt").Call("disconnect")
-		}))
 		server, err := jsutil.Await(device.Get("gatt").Call("connect"))
 		if err != nil {
 			log.Print(err)
@@ -243,6 +254,19 @@ func (bt *BLE) Connect() {
 			log.Println(err)
 		}
 		log.Println("connect successful")
+		minID, maxID, err := bt.ReadRecordStatus()
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		log.Println("status:", minID, maxID)
+		bt.MinID = minID
+		bt.MaxID = maxID
+		if err := bt.SendRecordRequest(minID, maxID); err != nil {
+			log.Print(err)
+			return
+		}
+		log.Println("request:", minID, maxID)
 		bt.connect = true
 		bt.Update()
 	}()
@@ -251,7 +275,16 @@ func (bt *BLE) Connect() {
 // Disconnect ...
 func (bt *BLE) Disconnect() {
 	log.Println("disconnect")
-	bt.connect = false
-	bt.Update()
-	bt.Release()
+	bluetooth.Call("getDevices").Call("then",
+		jsutil.Callback1(func(res js.Value) interface{} {
+			for i := 0; i < res.Length(); i++ {
+				console.Call("log", res.Index(i))
+				res.Index(i).Get("gatt").Call("disconnect")
+			}
+			bt.connect = false
+			bt.Update()
+			bt.Release()
+			return nil
+		}),
+	)
 }
