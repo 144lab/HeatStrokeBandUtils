@@ -133,6 +133,13 @@ func (bt *BLE) onNotifyRecord(ev js.Value) {
 			return
 		}
 		bt.Log(recordID, l)
+	case 0x03:
+		l, err := bt.ParseRtcRecord(recordID, b[6:])
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		bt.Log(recordID, l)
 	}
 	bt.lastID = recordID
 }
@@ -260,6 +267,11 @@ func (bt *BLE) Connect() {
 			return
 		}
 		log.Println("status:", minID, maxID)
+		if minID == maxID {
+			js.Global().Call("alert", "no data")
+			bt.Update()
+			return
+		}
 		bt.MinID = minID
 		bt.MaxID = maxID
 		if err := bt.SendRecordRequest(minID, maxID); err != nil {

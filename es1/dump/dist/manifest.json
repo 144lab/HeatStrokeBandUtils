@@ -1,7 +1,7 @@
 {
-  "name": "MT-BAND Monitor",
-  "short_name": "MT-BAND-Mon",
-  "description": "MT-BAND Monitor Utility",
+  "name": "MT-BAND Dump Tool",
+  "short_name": "MT-BAND-Dump",
+  "description": "MT-BAND Dump Tool Utility",
   "start_url": "/HeatStrokeBandUtils/es1/monitor/dist/",
   "display": "standalone",
   "background_color": "#444444",

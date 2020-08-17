@@ -6,8 +6,10 @@
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="PWA-Example1" />
-    <link rel="manifest" href="./manifest.json" />
+    <meta name="apple-mobile-web-app-title" content="MT-BAND Dump Tool" />
+    <!--
+      <link rel="manifest" href="./manifest.json" />
+    -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/spectre.css/dist/spectre.min.css"
@@ -21,15 +23,17 @@
       href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css"
     />
     <script defer src="wasm_exec.js"></script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("./serviceworker.js")
-          .then(function () {
-            console.log("Service Worker is registered!!");
-          });
-      }
-    </script>
+    <!--
+      <script>
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker
+            .register("./serviceworker.js")
+            .then(function () {
+              console.log("Service Worker is registered!!");
+            });
+        }
+      </script>
+    -->
     <script>
       (async () => {
         const resp = await fetch("main.wasm");

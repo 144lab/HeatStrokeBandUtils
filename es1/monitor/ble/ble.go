@@ -44,17 +44,18 @@ func js2bytes(dv js.Value) []byte {
 
 // BLE ...
 type BLE struct {
-	Update        func()
-	resources     []jsutil.Releaser
-	connect       bool
-	write         js.Value
-	recordStatus  js.Value
-	lastID        uint32
-	FwRevision    string
-	BatteryRemain int
-	CurrentEnv    EnvPayload
-	average       *Average
-	BPM           string
+	Update           func()
+	resources        []jsutil.Releaser
+	connect          bool
+	write            js.Value
+	recordStatus     js.Value
+	lastID           uint32
+	FwRevision       string
+	BatteryRemain    int
+	CurrentEnv       EnvPayload
+	average          *Average
+	BPM              string
+	CurrentRtcAdjust RtcPayload
 }
 
 // Release ...
@@ -119,6 +120,8 @@ func (bt *BLE) onNotifyRecord(ev js.Value) {
 		bt.parseRriRecord(recordID, b[6:])
 	case 0x02:
 		bt.parseEnvRecord(recordID, b[6:])
+	case 0x03:
+		bt.parseRtcRecord(recordID, b[6:])
 	}
 	bt.lastID = recordID
 }

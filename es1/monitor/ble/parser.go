@@ -118,3 +118,21 @@ func (bt *BLE) GetBatteryStyle() string {
 func (bt *BLE) GetBatteryLabel() string {
 	return fmt.Sprintf("%d%%", bt.CurrentEnv.Battery)
 }
+
+// RtcPayload ...
+type RtcPayload struct {
+	New uint32
+	Old uint32
+}
+
+func (bt *BLE) parseRtcRecord(id uint32, b []byte) {
+	var payload RtcPayload
+	err := binary.Read(bytes.NewReader(b), binary.LittleEndian, &payload)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	log.Printf("rtc(id=%d): %#v", id, payload)
+	bt.CurrentRtcAdjust = payload
+	bt.Update()
+}

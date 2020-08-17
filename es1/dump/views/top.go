@@ -21,15 +21,15 @@ func NewTop() *Top {
 type Top struct {
 	spago.Core
 	BLE     *ble.BLE
-	Current uint32
+	Current int
 	Lines   string
 }
 
 // Log ...
 func (c *Top) Log(id uint32, s string) {
-	c.Current = id
+	c.Current = int(id)
 	c.Lines += s + "\n"
-	if c.Current >= c.BLE.MaxID-1 {
+	if c.Current >= int(c.BLE.MaxID-1) {
 		c.BLE.Disconnect()
 	}
 	spago.Rerender(c)
@@ -42,11 +42,11 @@ func (c *Top) Update() {
 
 // GetProgress ...
 func (c *Top) GetProgress() int {
-	total := c.BLE.MaxID - c.BLE.MinID - 1
+	total := int(c.BLE.MaxID) - int(c.BLE.MinID)
 	if total == 0 {
 		return 0
 	}
-	return int((c.Current - c.BLE.MinID) * 100 / total)
+	return (c.Current - int(c.BLE.MinID) + 1) * 100 / total
 }
 
 // OnStartClick ...
@@ -56,6 +56,8 @@ func (c *Top) OnStartClick(ev js.Value) interface{} {
 	if c.BLE.IsConnect() {
 		return nil
 	}
+	c.Current = -1
+	c.Lines = ""
 	c.BLE.Connect()
 	return nil
 }
