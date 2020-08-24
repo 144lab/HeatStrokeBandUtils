@@ -32,8 +32,6 @@ func (a *Average) Post(v uint16) float32 {
 	return a.sum / float32(a.n)
 }
 
-var average = &Average{}
-
 // RriPayload ...
 type RriPayload struct {
 	TimeStamp uint32

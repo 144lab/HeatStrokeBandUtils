@@ -91,7 +91,7 @@ func (bt *BLE) onNotifyBattery(ev js.Value) {
 			minID := binary.LittleEndian.Uint32(b[0:4])
 			maxID := binary.LittleEndian.Uint32(b[4:8])
 			log.Printf("record: min:%9d, max:%9d", minID, maxID)
-			startID := maxID - 10
+			startID := maxID - 100
 			if startID < minID {
 				startID = minID
 			}
