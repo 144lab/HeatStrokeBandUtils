@@ -53,7 +53,7 @@ func (bt *BLE) parseRriRecord(id uint32, b []byte) {
 	}
 	bpm := float32(0.0)
 	for _, v := range payload.Rri {
-		bpm = 60000.0 / average.Post(v)
+		bpm = 60000.0 / bt.average.Post(v)
 	}
 	log.Println("BPM:", bpm)
 	bt.BPM = fmt.Sprintf("%5.1f", bpm)
