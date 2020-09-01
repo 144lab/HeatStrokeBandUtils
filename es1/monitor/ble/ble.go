@@ -70,6 +70,11 @@ func (bt *BLE) IsConnect() bool {
 	return bt.connect
 }
 
+// WriteCmd ...
+func (bt *BLE) WriteCmd(cmd byte, payload ...byte) error {
+	return bt.writeValue(append([]byte{cmd}, payload...))
+}
+
 func (bt *BLE) writeValue(b []byte) error {
 	jv := js.Global().Get("Uint8Array").New(len(b))
 	js.CopyBytesToJS(jv, b)
@@ -77,9 +82,7 @@ func (bt *BLE) writeValue(b []byte) error {
 	return err
 }
 
-func (bt *BLE) onNotifyBattery(ev js.Value) {
-	bt.BatteryRemain = int(js2bytes(ev.Get("target").Get("value"))[0])
-	log.Printf("btRem: %d%%", bt.BatteryRemain)
+func (bt *BLE) refresh() {
 	if !bt.recordStatus.IsUndefined() {
 		go func() {
 			v, err := jsutil.Await(bt.recordStatus.Call("readValue"))
@@ -112,6 +115,12 @@ func (bt *BLE) onNotifyBattery(ev js.Value) {
 	}
 }
 
+func (bt *BLE) onNotifyBattery(ev js.Value) {
+	bt.BatteryRemain = int(js2bytes(ev.Get("target").Get("value"))[0])
+	log.Printf("btRem: %d%%", bt.BatteryRemain)
+	bt.refresh()
+}
+
 func (bt *BLE) onNotifyRecord(ev js.Value) {
 	b := js2bytes(ev.Get("target").Get("value"))
 	recordID := binary.LittleEndian.Uint32(b[0:4])
@@ -130,128 +139,129 @@ func (bt *BLE) onNotifyRecord(ev js.Value) {
 }
 
 // Connect ...
-func (bt *BLE) Connect() {
-	go func() {
-		log.Println("connect")
-		device, err := jsutil.Await(bluetooth.Call("requestDevice", filter))
-		if err != nil {
-			log.Print(err)
+func (bt *BLE) Connect() error {
+	log.Println("connect")
+	device, err := jsutil.Await(bluetooth.Call("requestDevice", filter))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return nil
+	}
+	console.Call("log", "device:", device)
+	bt.resources = append(bt.resources,
+		jsutil.Bind(device, "gattserverdisconnected", func(ev js.Value) {
+			console.Call("log", "discconnect:", ev)
+			bt.connect = false
+			bt.Update()
 			bt.Release()
-			return
-		}
-		console.Call("log", "device:", device)
-		bt.resources = append(bt.resources,
-			jsutil.Bind(device, "gattserverdisconnected", func(ev js.Value) {
-				console.Call("log", "discconnect:", ev)
-				bt.connect = false
-				bt.Update()
-				bt.Release()
-			}),
-		)
-		bt.resources = append(bt.resources, jsutil.ReleaserFunc(func() {
-			device.Get("gatt").Call("disconnect")
-		}))
-		server, err := jsutil.Await(device.Get("gatt").Call("connect"))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		service, err := jsutil.Await(server.Call("getPrimaryService", serviceUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		diService, err := jsutil.Await(server.Call("getPrimaryService", deviceInfoUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		btService, err := jsutil.Await(server.Call("getPrimaryService", batteryInfoUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		console.Call("log", service, diService, btService)
-		fwRev, err := jsutil.Await(diService.Call("getCharacteristic", firmwareRevUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		btRem, err := jsutil.Await(btService.Call("getCharacteristic", batteryRemainUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		bt.resources = append(bt.resources,
-			jsutil.Bind(btRem, "characteristicvaluechanged", bt.onNotifyBattery),
-		)
-		fwRevValue, err := jsutil.Await(fwRev.Call("readValue"))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		btRemValue, err := jsutil.Await(btRem.Call("readValue"))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		bt.FwRevision = string(js2bytes(fwRevValue))
-		bt.BatteryRemain = int(js2bytes(btRemValue)[0])
-		write, err := jsutil.Await(service.Call("getCharacteristic", writeUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		bt.write = write
-		recordStatus, err := jsutil.Await(service.Call("getCharacteristic", recordStausUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		bt.recordStatus = recordStatus
-		recordNotify, err := jsutil.Await(service.Call("getCharacteristic", recordNotifyUUID))
-		if err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		console.Call("log", write, recordStatus, recordNotify)
-		log.Println("bind")
-		bt.resources = append(bt.resources,
-			jsutil.Bind(recordNotify, "characteristicvaluechanged", bt.onNotifyRecord),
-		)
-		log.Println("startNotifications1")
-		if _, err := jsutil.Await(btRem.Call("startNotifications")); err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		log.Println("startNotifications2")
-		if _, err := jsutil.Await(recordNotify.Call("startNotifications")); err != nil {
-			log.Print(err)
-			bt.Release()
-			return
-		}
-		log.Println("write rtc...")
-		b := []byte{0xfb, 0, 0, 0, 0}
-		binary.LittleEndian.PutUint32(b[1:5], uint32(time.Now().Unix()))
-		if err := bt.writeValue(b); err != nil {
-			log.Println(err)
-		}
-		log.Println("connect successful")
-		bt.connect = true
-		bt.Update()
-	}()
+		}),
+	)
+	bt.resources = append(bt.resources, jsutil.ReleaserFunc(func() {
+		device.Get("gatt").Call("disconnect")
+	}))
+	server, err := jsutil.Await(device.Get("gatt").Call("connect"))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	service, err := jsutil.Await(server.Call("getPrimaryService", serviceUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	diService, err := jsutil.Await(server.Call("getPrimaryService", deviceInfoUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	btService, err := jsutil.Await(server.Call("getPrimaryService", batteryInfoUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	console.Call("log", service, diService, btService)
+	fwRev, err := jsutil.Await(diService.Call("getCharacteristic", firmwareRevUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	btRem, err := jsutil.Await(btService.Call("getCharacteristic", batteryRemainUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	bt.resources = append(bt.resources,
+		jsutil.Bind(btRem, "characteristicvaluechanged", bt.onNotifyBattery),
+	)
+	fwRevValue, err := jsutil.Await(fwRev.Call("readValue"))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	btRemValue, err := jsutil.Await(btRem.Call("readValue"))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	bt.FwRevision = string(js2bytes(fwRevValue))
+	bt.BatteryRemain = int(js2bytes(btRemValue)[0])
+	write, err := jsutil.Await(service.Call("getCharacteristic", writeUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	bt.write = write
+	recordStatus, err := jsutil.Await(service.Call("getCharacteristic", recordStausUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	bt.recordStatus = recordStatus
+	recordNotify, err := jsutil.Await(service.Call("getCharacteristic", recordNotifyUUID))
+	if err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	console.Call("log", write, recordStatus, recordNotify)
+	log.Println("bind")
+	bt.resources = append(bt.resources,
+		jsutil.Bind(recordNotify, "characteristicvaluechanged", bt.onNotifyRecord),
+	)
+	log.Println("startNotifications1")
+	if _, err := jsutil.Await(btRem.Call("startNotifications")); err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	log.Println("startNotifications2")
+	if _, err := jsutil.Await(recordNotify.Call("startNotifications")); err != nil {
+		log.Print(err)
+		bt.Release()
+		return err
+	}
+	log.Println("write rtc...")
+	b := []byte{0xfb, 0, 0, 0, 0}
+	binary.LittleEndian.PutUint32(b[1:5], uint32(time.Now().Unix()))
+	if err := bt.writeValue(b); err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Println("connect successful")
+	bt.connect = true
+	bt.Update()
+	time.AfterFunc(3*time.Second, bt.refresh)
+	return nil
 }
 
 // Disconnect ...
