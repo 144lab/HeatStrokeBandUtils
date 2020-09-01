@@ -14,6 +14,7 @@ var urlsToCache = [
   "./main.wasm",
   "./serviceworker.js",
   "./assets/favicon.png",
+  "./assets/app.css",
   "./assets/icons/apple-touch-icon-120x120.png",
   "./assets/icons/apple-touch-icon-152x152.png",
   "./assets/icons/apple-touch-icon-180x180.png",
