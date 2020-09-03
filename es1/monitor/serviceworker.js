@@ -1,4 +1,4 @@
-var CACHE_NAME = "mt-band-monitor-v1";
+var CACHE_NAME = "mt-band-monitor-v11";
 
 console.log("loading: serviceworker");
 
