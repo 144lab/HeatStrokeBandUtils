@@ -56,7 +56,7 @@ func (bt *BLE) parseRriRecord(id uint32, b []byte) {
 		bpm = 60000.0 / bt.average.Post(v)
 	}
 	log.Println("BPM:", bpm)
-	bt.BPM = fmt.Sprintf("%5.1f", bpm)
+	bt.BPM = bpm
 }
 
 // EnvPayload ...

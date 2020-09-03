@@ -56,47 +56,72 @@
         </div>
         <div class="col-10 col-sm-12">
           <div class="columns">
-            <div class="input-group column col-4 col-xs-12">
+            <div
+              class="input-group column col-4 col-xs-12"
+              @='{{spago.ClassMap{"tooltip":!c.IsBpmValid()}}}'
+              data-tooltip="BPM out of range(115...125)"
+            >
               <span class="input-group-addon addon-lg">BPM</span>
               <input
                 type="text"
-                class="form-input input-lg"
+                class="form-input input-lg is-error"
+                @='{{spago.ClassMap{"is-error":!c.IsBpmValid()}}}'
                 readonly
                 value="{{c.BLE.BPM}}"
               />
             </div>
-            <div class="input-group column col-4 col-xs-12">
+            <div
+              class="input-group column col-4 col-xs-12"
+              @='{{spago.ClassMap{"tooltip":!c.IsHumidityValid()}}}'
+              data-tooltip="Humidity out of range(30...80)"
+            >
               <span class="input-group-addon addon-lg">Humidity</span>
               <input
                 type="text"
                 class="form-input input-lg"
+                @='{{spago.ClassMap{"is-error":!c.IsHumidityValid()}}}'
                 readonly
                 value="{{c.BLE.CurrentEnv.GetHumidity()}}"
               />
             </div>
-            <div class="input-group column col-4 col-xs-12">
+            <div
+              class="input-group column col-4 col-xs-12"
+              @='{{spago.ClassMap{"tooltip":!c.IsTempValid()}}}'
+              data-tooltip="Temperature out of range(10...40)"
+            >
               <span class="input-group-addon addon-lg">Temperature</span>
               <input
                 type="text"
                 class="form-input input-lg"
+                @='{{spago.ClassMap{"is-error":!c.IsTempValid()}}}'
                 readonly
                 value="{{c.BLE.CurrentEnv.GetTemperature()}}"
               />
             </div>
-            <div class="input-group column col-4 col-xs-12">
+            <div
+              class="input-group column col-4 col-xs-12"
+              @='{{spago.ClassMap{"tooltip":!c.IsSkinTempValid()}}}'
+              data-tooltip="Skin-Temp. out of range(10...40)"
+            >
               <span class="input-group-addon addon-lg">Skin-Temp.</span>
               <input
                 type="text"
                 class="form-input input-lg"
+                @='{{spago.ClassMap{"is-error":!c.IsSkinTempValid()}}}'
                 readonly
                 value="{{c.BLE.CurrentEnv.GetSkinTemp()}}"
               />
             </div>
-            <div class="input-group column col-4 col-xs-12">
+            <div
+              class="input-group column col-4 col-xs-12"
+              @='{{spago.ClassMap{"tooltip":!c.IsEstTempValid()}}}'
+              data-tooltip="EST-Temp. out of range(10...40)"
+            >
               <span class="input-group-addon addon-lg">EST-Temp.</span>
               <input
                 type="text"
                 class="form-input input-lg"
+                @='{{spago.ClassMap{"is-error":!c.IsEstTempValid()}}}'
                 readonly
                 value="{{c.BLE.CurrentEnv.GetEstTemp()}}"
               />

@@ -39,6 +39,31 @@ type Top struct {
 	timer *time.Timer
 }
 
+// IsBpmValid ...
+func (c *Top) IsBpmValid() bool {
+	return 115 <= c.BLE.BPM && c.BLE.BPM <= 125
+}
+
+// IsHumidityValid ...
+func (c *Top) IsHumidityValid() bool {
+	return 3000 <= c.BLE.CurrentEnv.Humidity && c.BLE.CurrentEnv.Humidity <= 8000
+}
+
+// IsTempValid ...
+func (c *Top) IsTempValid() bool {
+	return 1000 <= c.BLE.CurrentEnv.Temperature && c.BLE.CurrentEnv.Temperature <= 4000
+}
+
+// IsSkinTempValid ...
+func (c *Top) IsSkinTempValid() bool {
+	return 1000 <= c.BLE.CurrentEnv.SkinTemp && c.BLE.CurrentEnv.SkinTemp <= 4000
+}
+
+// IsEstTempValid ...
+func (c *Top) IsEstTempValid() bool {
+	return 3700 <= c.BLE.CurrentEnv.EstTemp && c.BLE.CurrentEnv.EstTemp <= 3800
+}
+
 // Update ...
 func (c *Top) Update() {
 	c.timer.Reset(UUpdateTimeout)

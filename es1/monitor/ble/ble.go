@@ -54,7 +54,7 @@ type BLE struct {
 	BatteryRemain    int
 	CurrentEnv       EnvPayload
 	average          *Average
-	BPM              string
+	BPM              float32
 	CurrentRtcAdjust RtcPayload
 }
 
