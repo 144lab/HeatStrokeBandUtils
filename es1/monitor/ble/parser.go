@@ -15,7 +15,7 @@ env-record:   58628 22492F5F7312EB0ABB0ABC0E3002(14bytes)
 // Average ...
 type Average struct {
 	n   int
-	b   [128]uint16
+	b   [16]uint16
 	pos int
 	sum float32
 }
