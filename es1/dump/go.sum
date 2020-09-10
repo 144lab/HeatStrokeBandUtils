@@ -20,3 +20,5 @@ github.com/nobonobo/spago v0.0.0-20200811074527-125def848b7e h1:8C2bMk65K88tPO4H
 github.com/nobonobo/spago v0.0.0-20200811074527-125def848b7e/go.mod h1:ZPTMMKJfVDzBgEgWIalYx9DxMYbux4Vw4rE/nWy7xBw=
 github.com/nobonobo/spago v0.0.0-20200811091608-e3f749af3a71 h1:iMDz5BwhMI+nQEgmPOudRBrzgqWeuPhCdkIgGDajC8Y=
 github.com/nobonobo/spago v0.0.0-20200811091608-e3f749af3a71/go.mod h1:ZPTMMKJfVDzBgEgWIalYx9DxMYbux4Vw4rE/nWy7xBw=
+github.com/nobonobo/spago v0.0.0-20200909114116-9cf03bd4131e h1:q8DqyWylkX4YhKFFbNk0vEIzUcuJYXcopvLdutol/Vg=
+github.com/nobonobo/spago v0.0.0-20200909114116-9cf03bd4131e/go.mod h1:ZPTMMKJfVDzBgEgWIalYx9DxMYbux4Vw4rE/nWy7xBw=

@@ -1,17 +1,17 @@
 <body>
   <header
     class="navbar"
-    style="box-shadow: lightgrey 2px 2px 2px; padding: 1rem;"
+    style="box-shadow: lightgrey 2px 2px 2px; padding: 1rem"
   >
     <section class="navber-section">
       <a
         class="navbar-brand mr-2"
-        style="text-transform: uppercase; font-weight: bold;"
+        style="text-transform: uppercase; font-weight: bold"
         >MT-BAND Dump Tool</a
       >
     </section>
   </header>
-  <main class="container" style="padding: 1rem;">
+  <main class="container" style="padding: 1rem">
     <form class="form-horizontal">
       <div class="form-group">
         <div class="col-3 col-sm-12">
@@ -42,7 +42,7 @@
         <div class="col-3 col-sm-12">
           <label class="form-label" for="input-example-1">Progress</label>
         </div>
-        <div class="col-9 col-sm-12" style="margin: auto;">
+        <div class="col-9 col-sm-12" style="margin: auto">
           <div class="bar">
             <div class="bar-item" style="width: {{c.GetProgress()}}%;">
               {{c.Current}}/({{c.BLE.MinID}}...{{c.BLE.MaxID}}) -
@@ -57,7 +57,7 @@
         </div>
         <div class="col-9 col-sm-12">
           <textarea type="text" class="form-input input-lg" rows="12" readonly>
-{{c.Lines}}</textarea
+{{c.GetLog()}}</textarea
           >
         </div>
       </div>

@@ -287,15 +287,15 @@ func (bt *BLE) Connect() {
 // Disconnect ...
 func (bt *BLE) Disconnect() {
 	log.Println("disconnect")
+	bt.connect = false
+	bt.Update()
+	bt.Release()
 	bluetooth.Call("getDevices").Call("then",
 		jsutil.Callback1(func(res js.Value) interface{} {
 			for i := 0; i < res.Length(); i++ {
 				console.Call("log", res.Index(i))
 				res.Index(i).Get("gatt").Call("disconnect")
 			}
-			bt.connect = false
-			bt.Update()
-			bt.Release()
 			return nil
 		}),
 	)

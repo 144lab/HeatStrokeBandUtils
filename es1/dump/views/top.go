@@ -1,7 +1,9 @@
 package views
 
 import (
+	"strings"
 	"syscall/js"
+	"time"
 
 	"mtband-logger/ble"
 
@@ -14,6 +16,9 @@ import (
 func NewTop() *Top {
 	c := &Top{}
 	c.BLE = &ble.BLE{Update: c.Update, Log: c.Log}
+	c.timer = time.AfterFunc(1*time.Second, func() {
+		spago.Rerender(c)
+	})
 	return c
 }
 
@@ -22,22 +27,34 @@ type Top struct {
 	spago.Core
 	BLE     *ble.BLE
 	Current int
-	Lines   string
+	Lines   []string
+	last    time.Time
+	timer   *time.Timer
+}
+
+// GetLog ...
+func (c *Top) GetLog() string {
+	return strings.Join(c.Lines, "\n")
 }
 
 // Log ...
 func (c *Top) Log(id uint32, s string) {
 	c.Current = int(id)
-	c.Lines += s + "\n"
+	c.Lines = append(c.Lines, s)
 	if c.Current >= int(c.BLE.MaxID-1) {
 		c.BLE.Disconnect()
 	}
-	spago.Rerender(c)
+	c.Update()
 }
 
 // Update ...
 func (c *Top) Update() {
-	spago.Rerender(c)
+	tm := time.Now()
+	if tm.Sub(c.last) > 100*time.Millisecond {
+		spago.Rerender(c)
+		c.timer.Reset(1 * time.Second)
+		c.last = tm
+	}
 }
 
 // GetProgress ...
@@ -50,24 +67,22 @@ func (c *Top) GetProgress() int {
 }
 
 // OnStartClick ...
-func (c *Top) OnStartClick(ev js.Value) interface{} {
+func (c *Top) OnStartClick(ev js.Value) {
 	ev.Call("preventDefault")
-
 	if c.BLE.IsConnect() {
-		return nil
+		return
 	}
-	c.Current = -1
-	c.Lines = ""
+	c.Current = 0
+	c.Lines = []string{}
+	c.last = time.Time{}
 	c.BLE.Connect()
-	return nil
 }
 
 // OnStopClick ...
-func (c *Top) OnStopClick(ev js.Value) interface{} {
+func (c *Top) OnStopClick(ev js.Value) {
 	ev.Call("preventDefault")
 	if !c.BLE.IsConnect() {
-		return nil
+		return
 	}
 	c.BLE.Disconnect()
-	return nil
 }
