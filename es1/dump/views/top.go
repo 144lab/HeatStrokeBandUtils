@@ -5,9 +5,11 @@ import (
 	"syscall/js"
 	"time"
 
+	"mtband-logger/actions"
 	"mtband-logger/ble"
 
 	"github.com/nobonobo/spago"
+	"github.com/nobonobo/spago/dispatcher"
 )
 
 //go:generate spago generate -c Top -p views top.html
@@ -15,9 +17,22 @@ import (
 // NewTop ...
 func NewTop() *Top {
 	c := &Top{}
-	c.BLE = &ble.BLE{Update: c.Update, Log: c.Log}
-	c.timer = time.AfterFunc(1*time.Second, func() {
+	c.BLE = &ble.BLE{}
+	timer := time.AfterFunc(1*time.Second, func() {
 		spago.Rerender(c)
+	})
+	dispatcher.Register(actions.Refresh, func(opt ...interface{}) {
+		tm := time.Now()
+		if tm.Sub(c.last) > 100*time.Millisecond {
+			spago.Rerender(c)
+			c.last = tm
+		} else {
+			timer.Reset(1 * time.Second)
+		}
+	})
+	dispatcher.Register(actions.Log, func(opt ...interface{}) {
+		id, line := opt[0].(uint32), opt[1].(string)
+		c.Log(id, line)
 	})
 	return c
 }
@@ -44,17 +59,7 @@ func (c *Top) Log(id uint32, s string) {
 	if c.Current >= int(c.BLE.MaxID-1) {
 		c.BLE.Disconnect()
 	}
-	c.Update()
-}
-
-// Update ...
-func (c *Top) Update() {
-	tm := time.Now()
-	if tm.Sub(c.last) > 100*time.Millisecond {
-		spago.Rerender(c)
-		c.timer.Reset(1 * time.Second)
-		c.last = tm
-	}
+	dispatcher.Dispatch(actions.Refresh)
 }
 
 // GetProgress ...

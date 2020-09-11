@@ -4,9 +4,11 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
+	"mtband-logger/actions"
 	"syscall/js"
 	"time"
 
+	"github.com/nobonobo/spago/dispatcher"
 	"github.com/nobonobo/spago/jsutil"
 )
 
@@ -45,8 +47,6 @@ func js2bytes(dv js.Value) []byte {
 
 // BLE ...
 type BLE struct {
-	Update        func()
-	Log           func(id uint32, s string)
 	resources     []jsutil.Releaser
 	connect       bool
 	write         js.Value
@@ -120,26 +120,26 @@ func (bt *BLE) onNotifyRecord(ev js.Value) {
 	default:
 		return
 	case 0x01:
-		l, err := bt.ParseRriRecord(recordID, b[6:])
+		l, err := bt.ParsePpiRecord(recordID, b[6:])
 		if err != nil {
 			log.Print(err)
 			return
 		}
-		bt.Log(recordID, l)
+		dispatcher.Dispatch(actions.Log, recordID, l)
 	case 0x02:
 		l, err := bt.ParseEnvRecord(recordID, b[6:])
 		if err != nil {
 			log.Print(err)
 			return
 		}
-		bt.Log(recordID, l)
+		dispatcher.Dispatch(actions.Log, recordID, l)
 	case 0x03:
 		l, err := bt.ParseRtcRecord(recordID, b[6:])
 		if err != nil {
 			log.Print(err)
 			return
 		}
-		bt.Log(recordID, l)
+		dispatcher.Dispatch(actions.Log, recordID, l)
 	}
 	bt.lastID = recordID
 }
@@ -159,8 +159,8 @@ func (bt *BLE) Connect() {
 			jsutil.Bind(device, "gattserverdisconnected", func(ev js.Value) {
 				console.Call("log", "discconnect:", ev)
 				bt.connect = false
-				bt.Update()
 				bt.Release()
+				dispatcher.Dispatch(actions.Refresh)
 			}),
 		)
 		server, err := jsutil.Await(device.Get("gatt").Call("connect"))
@@ -269,7 +269,7 @@ func (bt *BLE) Connect() {
 		log.Println("status:", minID, maxID)
 		if minID == maxID {
 			js.Global().Call("alert", "no data")
-			bt.Update()
+			dispatcher.Dispatch(actions.Refresh)
 			return
 		}
 		bt.MinID = minID
@@ -280,7 +280,7 @@ func (bt *BLE) Connect() {
 		}
 		log.Println("request:", minID, maxID)
 		bt.connect = true
-		bt.Update()
+		dispatcher.Dispatch(actions.Refresh)
 	}()
 }
 
@@ -288,7 +288,7 @@ func (bt *BLE) Connect() {
 func (bt *BLE) Disconnect() {
 	log.Println("disconnect")
 	bt.connect = false
-	bt.Update()
+	dispatcher.Dispatch(actions.Refresh)
 	bt.Release()
 	bluetooth.Call("getDevices").Call("then",
 		jsutil.Callback1(func(res js.Value) interface{} {

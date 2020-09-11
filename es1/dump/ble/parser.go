@@ -42,8 +42,8 @@ type RriPayload struct {
 	SeqNum    uint8
 }
 
-// ParseRriRecord ...
-func (bt *BLE) ParseRriRecord(id uint32, b []byte) (string, error) {
+// ParsePpiRecord ...
+func (bt *BLE) ParsePpiRecord(id uint32, b []byte) (string, error) {
 	var payload RriPayload
 	err := binary.Read(bytes.NewReader(b), binary.LittleEndian, &payload)
 	if err != nil {
@@ -53,7 +53,7 @@ func (bt *BLE) ParseRriRecord(id uint32, b []byte) (string, error) {
 	for _, v := range payload.Rri {
 		rris = append(rris, fmt.Sprintf("%d", v))
 	}
-	return fmt.Sprintf("RRI, %d, %d, %s, %d, %d",
+	return fmt.Sprintf("PPI, %d, %d, %s, %d, %d",
 			id, payload.TimeStamp, strings.Join(rris, ", "), payload.Led, payload.SeqNum),
 		nil
 }
